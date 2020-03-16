@@ -5,11 +5,11 @@ import {
   Grid,
 } from '@material-ui/core';
 
-const ContactList = () => {
+const ContactList = ({ contacts, selectedContact, selectContact, editContact, isEditing }) => {
   return (
-    <Grid item md={6}>
+    <Grid item lg={6} xs={12}>
       <ContactListHeader />
-      <ContactListBody />
+      <ContactListBody contacts={contacts} selectedContact={selectedContact} selectContact={selectContact} editContact={editContact} isEditing={isEditing} />
     </Grid>
   );
 };

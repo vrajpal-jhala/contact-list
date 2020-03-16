@@ -13,7 +13,10 @@ const styles = theme => ({
   root: {
     display: 'flex',
   },
-  contentFixed: {
+  content: {
+    width: '100%'
+  },
+  contentPosition: {
     position: "static",
     [theme.breakpoints.only("xs")]: {
       position: "fixed",
@@ -58,7 +61,7 @@ class ContactApp extends React.Component {
           open={drawer}
           handleMiniDrawerToggle={this.handleMiniDrawerToggle}
         />
-        <div style={{ width: "100%" }} className={clsx(drawer === "open" && classes.contentFixed)}>
+        <div className={clsx(classes.content, drawer === "open" && classes.contentPosition)}>
           <AppHeader
             handleFullDrawerToggle={this.handleFullDrawerToggle}
           />
