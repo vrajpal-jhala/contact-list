@@ -6,6 +6,7 @@ import ContactForm from '../components/ContactForm';
 import {
   Grid,
   withStyles,
+  Hidden,
 } from '@material-ui/core';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -27,8 +28,9 @@ const styles = theme => ({
   }
 });
 
-const data = [
+let contacts = [
   {
+    "id": "1",
     "name": "Joey Tribbiani",
     "about": "Actor",
     "email": "joeyt@friends.com",
@@ -37,14 +39,16 @@ const data = [
     "address": "2738  Liberty Avenue, California"
   },
   {
+    "id": "2",
     "name": "Rachel Green",
     "about": "Fashion Designer",
     "email": "greenrach@friends.com",
     "phone": "718-896-1555",
-    "company": "ZARA",
+    "company": "Ralph Lauren",
     "address": "377  Abia Martin Drive, Bethpage, New York"
   },
   {
+    "id": "3",
     "name": "Ross Geller",
     "about": "Paleontologist",
     "email": "rossaurus@friends.com",
@@ -53,6 +57,7 @@ const data = [
     "address": "4437  Plainfield Avenue, HOPKINTON, Massachusetts"
   },
   {
+    "id": "4",
     "name": "Phoebe Buffay",
     "about": "Masseuse",
     "email": "phebes@friends.com",
@@ -61,6 +66,7 @@ const data = [
     "address": ""
   },
   {
+    "id": "5",
     "name": "Monica Geller",
     "about": "Chef",
     "email": "mon@friends.com",
@@ -69,6 +75,7 @@ const data = [
     "address": ""
   },
   {
+    "id": "6",
     "name": "Chandler Bing",
     "about": "Copywriter",
     "email": "mrbing@friends.com",
@@ -77,6 +84,7 @@ const data = [
     "address": "4709  Roosevelt Road, Dodge City, Kansas"
   },
   {
+    "id": "7",
     "name": "Gunther",
     "about": "Cafe Owner",
     "email": "gunther@friends.com",
@@ -85,6 +93,7 @@ const data = [
     "address": ""
   },
   {
+    "id": "8",
     "name": "Jill Green",
     "about": "Rachel's sister",
     "email": "jgreen@gmail.com",
@@ -93,6 +102,7 @@ const data = [
     "address": "2035  Nixon Avenue, Kingsport, Tennessee"
   },
   {
+    "id": "9",
     "name": "Jack Geller",
     "about": "Ross' father",
     "email": "jackg@gmail.com",
@@ -108,51 +118,155 @@ class Local extends React.Component {
     super(props);
 
     this.state = {
-      data: data,
-      selectedContact: null,
+      data: contacts,
+      selectedContact: {},
       editable: false,
+      isAdding: false,
+      searchQuery: '',
     }
   }
 
-  setSelectedContact = (contact) => {
+  setSelectedContact = (id) => {
+    const { data, selectedContact, editable } = this.state;
+    const isAdding = id === data.length;
     this.setState({
-      selectedContact: contact,
+      selectedContact: isAdding ? selectedContact : data.find(contact => contact.id === id),
+      isAdding: isAdding,
+      editable: editable && id === selectedContact.id,
     });
   };
 
-  setEditable = (editable) => {
+  setEditable = (id) => {
+    const { data, selectedContact } = this.state;
     this.setState({
-      editable: editable,
+      editable: id === selectedContact.id,
+      selectedContact: data.find(contact => contact.id === id),
     });
   };
 
   updateContact = (updatedContact) => {
-    var { data, selectedContact } = this.state;
-    data[selectedContact] = Object.assign({}, data[selectedContact], updatedContact);
+    var { selectedContact } = this.state;
+    var index = contacts.findIndex(contact => contact.id === selectedContact.id);
+    contacts[index] = Object.assign({}, contacts[index], updatedContact);
     this.setState({
-      data: data,
+      data: contacts,
       editable: false,
     });
   };
 
+  saveContact = (newContactName) => {
+    var { data } = this.state;
+    data.push({
+      "id": data.length,
+      "name": newContactName,
+    });
+    this.setState({
+      data: data,
+      isAdding: false,
+    });
+  }
+
+  addContact = () => {
+    const { data } = this.state;
+    this.setState({
+      isAdding: true,
+      selectedContact: { "id": data.length },
+    });
+  }
+
+  checkContact = (id) => {
+    var { data } = this.state;
+    const index = data.findIndex(contact => contact.id === id);
+    data[index].checked = !data[index].checked;
+
+    this.setState({
+      data: data,
+    });
+  }
+
+  selectAll = () => {
+    var { data } = this.state;
+
+    data.forEach(contact => contact.checked = true);
+
+    this.setState({
+      data: data,
+    });
+  }
+
+  deselectAll = () => {
+    var { data } = this.state;
+
+    data.forEach(contact => contact.checked = false);
+
+    this.setState({
+      data: data,
+    });
+  }
+
+  deleteContact = () => {
+    contacts = contacts.filter((contact) => !contact.checked);
+
+    this.setState({
+      data: contacts,
+      searchQuery: '',
+      editable: false,
+      isAdding: false,
+      selectedContact: {},
+    });
+  }
+
+  searchContact = ({ target }) => {
+    var { value } = target;
+
+    const filteredData = contacts.filter((contact) => contact.name.toLowerCase().includes(value.toLowerCase()));
+
+    this.setState({
+      data: filteredData,
+      searchQuery: value,
+      editable: false,
+      isAdding: false,
+      selectedContact: {},
+    });
+  }
+
   render = () => {
     const { classes } = this.props;
 
-    const { data, selectedContact, editable } = this.state;
+    let { data, selectedContact, editable, isAdding, searchQuery } = this.state;
+
+    var allSelected = data.length && data.every(contact => contact.checked);
+    var someSelected = data.some(contact => contact.checked);
 
     return (
       <Grid container className={classes.outerSpacing} >
         <SceneHeader />
         <Grid container item md={12} className={classes.innerSpacing}>
-          <ActionBar />
+          <ActionBar
+            addContact={this.addContact}
+            deleteContact={this.deleteContact}
+            searchQuery={searchQuery}
+            searchContact={this.searchContact}
+            someSelected={someSelected}
+          />
           <ContactList
             contacts={data}
             selectedContact={selectedContact}
             selectContact={this.setSelectedContact}
             editContact={this.setEditable}
+            updateContact={this.updateContact}
             isEditing={editable}
+            isAdding={isAdding}
+            saveContact={this.saveContact}
+            checkContact={this.checkContact}
+            selectAll={this.selectAll}
+            deselectAll={this.deselectAll}
+            allSelected={allSelected}
+            someSelected={someSelected}
           />
-          <ContactForm selectedContact={data[selectedContact]} editable={editable} updateContact={this.updateContact} />
+          <Hidden mdDown>
+            <ContactForm selectedContact={data.find(contact => contact.id === selectedContact.id)} editable={editable} updateContact={this.updateContact} />
+          </Hidden>
         </Grid>
       </Grid >
     );

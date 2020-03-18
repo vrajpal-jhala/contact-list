@@ -3,13 +3,47 @@ import ContactListHeader from '../components/ContactListHeader';
 import ContactListBody from '../components/ContactListBody';
 import {
   Grid,
+  makeStyles,
 } from '@material-ui/core';
 
-const ContactList = ({ contacts, selectedContact, selectContact, editContact, isEditing }) => {
+const useStyle = makeStyles(theme => ({
+  noContacts: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '40vh'
+  }
+}));
+
+const ContactList = ({ contacts, selectedContact, selectContact, editContact, isEditing, updateContact, saveContact, isAdding, checkContact, someSelected, allSelected, selectAll, deselectAll }) => {
+
+  const classes = useStyle();
+
   return (
     <Grid item lg={6} xs={12}>
-      <ContactListHeader />
-      <ContactListBody contacts={contacts} selectedContact={selectedContact} selectContact={selectContact} editContact={editContact} isEditing={isEditing} />
+      <ContactListHeader
+        someSelected={someSelected}
+        allSelected={allSelected}
+        selectAll={selectAll}
+        deselectAll={deselectAll}
+      />
+      {
+        contacts.length > 0 ?
+          <ContactListBody
+            contacts={contacts}
+            selectedContact={selectedContact}
+            selectContact={selectContact}
+            editContact={editContact}
+            isEditing={isEditing}
+            updateContact={updateContact}
+            isAdding={isAdding}
+            saveContact={saveContact}
+            checkContact={checkContact}
+          /> :
+          <h3 className={classes.noContacts}>
+            No Contacts
+          </h3>
+      }
     </Grid>
   );
 };

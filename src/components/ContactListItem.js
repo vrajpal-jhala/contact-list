@@ -50,18 +50,39 @@ const useStyle = makeStyles(theme => ({
   },
 }));
 
-const ContactListItem = ({ index, contact, selectContact, active, editContact, isEditing, isNewContact }) => {
+const ContactListItem = ({ contact, selectContact, active, editContact, isNewContact, saveContact, checkContact }) => {
   const classes = useStyle();
 
-  const { avatar, name, email, company } = contact;
+  const { id, avatar, name, email, company, checked } = contact;
 
-  const [newContact, setNewContact] = useState({});
+  const [newContactName, setNewContactName] = useState('');
+
+  const stringToColour = (str) => {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    var colour = '#';
+    for (i = 0; i < 3; i++) {
+      var value = (hash >> (i * 8)) & 0xFF;
+      colour += ('00' + value.toString(16)).substr(-2);
+    }
+    return colour + 'bf';
+  }
 
   return (
-    <Grid container alignItems="center" className={clsx(classes.contact, active && 'active')} onClick={() => { selectContact(index); isEditing && editContact(false); }}>
+    <Grid container
+      alignItems="center"
+      name="contactItem"
+      className={clsx(classes.contact, active && 'active')}
+      onClick={() => selectContact(id)}
+    >
       <Grid item md={1} xs={2} sm={2}>
         <Checkbox
+          onClick={(event) => { checkContact(id); event.stopPropagation(); }}
           color="primary"
+          checked={checked || false}
+          disabled={isNewContact}
         />
       </Grid>
       <Grid item md={5} xs={10} sm={9}>
@@ -71,23 +92,27 @@ const ContactListItem = ({ index, contact, selectContact, active, editContact, i
               src={avatar}
               className={classes.contactAvatar}
               style={{
-                backgroundColor: '#' + Math.floor(Math.random() * 16777215).toString(16) + 'bf'
+                backgroundColor: stringToColour(name + email)
               }} >
-              {name.split(" ").map((n) => n[0])}
+              {
+                isNewContact ?
+                  '' :
+                  name.split(" ").map((n) => n[0])
+              }
             </Avatar>
           </Box>
           <Box className={classes.contactName}>
             <h3 className={classes.noMargin}>
               {
                 isNewContact ?
-                  <Input placeholder="John Doe" /> :
+                  <Input placeholder="John Doe" defaultValue={newContactName} onClick={(event) => event.stopPropagation()} onChange={(event) => setNewContactName(event.target.value)} /> :
                   name
               }
             </h3>
             <small>
               {
                 isNewContact ?
-                  <Input fullWidth placeholder="abc@xyz.com" style={{ fontSize: 12 }} /> :
+                  '' :
                   email
               }
             </small>
@@ -99,7 +124,7 @@ const ContactListItem = ({ index, contact, selectContact, active, editContact, i
           <h4 className={classes.noMargin}>
             {
               isNewContact ?
-                <Input placeholder="company" /> :
+                '' :
                 company
             }
           </h4>
@@ -109,10 +134,10 @@ const ContactListItem = ({ index, contact, selectContact, active, editContact, i
         <Grid item md={1} sm={1}>
           {
             isNewContact ?
-              <IconButton size="small" className={classes.editBtn}>
+              <IconButton size="small" className={classes.editBtn} onClick={(event) => { saveContact(newContactName); event.stopPropagation() }}>
                 <Check />
               </IconButton> :
-              <IconButton size="small" className={classes.editBtn} onClick={() => editContact(true)}>
+              <IconButton size="small" className={classes.editBtn} onClick={(event) => { editContact(id); event.stopPropagation() }}>
                 <Edit />
               </IconButton>
           }

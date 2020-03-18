@@ -13,7 +13,7 @@ const useStyle = makeStyles(theme => ({
   }
 }));
 
-const ContactListHeader = () => {
+const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll }) => {
   const classes = useStyle();
 
   return (
@@ -21,9 +21,10 @@ const ContactListHeader = () => {
       <Grid item container xs={12} style={{ alignItems: 'center' }}>
         <Grid item md={1} xs={2} sm={2}>
           <Checkbox
+            onClick={() => allSelected || someSelected ? deselectAll() : selectAll()}
             color="primary"
-            value="indeterminate"
-            indeterminate
+            indeterminate={someSelected && !allSelected}
+            checked={allSelected || someSelected}
           />
         </Grid>
         <Grid item md={5} xs={10} sm={9}>Basic Info</Grid>

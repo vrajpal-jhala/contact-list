@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import {
   Search,
+  Delete,
 } from '@material-ui/icons';
 
 const useStyle = makeStyles(theme => ({
@@ -35,42 +36,62 @@ const useStyle = makeStyles(theme => ({
     flex: 1,
     fontSize: 14,
   },
-  addBtnWrapper: {
+  btnWrapper: {
     padding: '50px 20px',
     [theme.breakpoints.down("sm")]: {
       padding: '30px 10px',
     },
+    [theme.breakpoints.down("xs")]: {
+      display: 'flex',
+      justifyContent: 'space-around',
+      padding: '0px 10px 30px 10px',
+    },
   },
-  addBtn: {
+  actionBtn: {
     background: 'linear-gradient(to right, #fa8569, #ff4b6e)',
     color: '#ffffffbf',
     textTransform: 'none',
     height: '100%',
-    [theme.breakpoints.only("xs")]: {
-      borderRadius: '50%',
-      minWidth: '44px',
+    margin: '0px 2px',
+    [theme.breakpoints.down("sm")]: {
+      margin: '0px 6px',
+      minWidth: '48px',
+    },
+    [theme.breakpoints.down("xs")]: {
+      minWidth: '90px',
+    },
+    [theme.breakpoints.up("md")]: {
+      minWidth: '126px',
     },
   },
 }));
 
-const ActionBar = () => {
+const ActionBar = ({ addContact, someSelected, deleteContact, searchQuery, searchContact }) => {
   const classes = useStyle();
 
   return (
     <Grid container item md={12}>
-      <Grid item lg={4} md={6} sm={8} xs={9} className={classes.searchBarSpacing}>
+      <Grid item lg={4} md={6} sm={8} xs={12} className={classes.searchBarSpacing}>
         <Paper elevation={0} className={classes.searchBar}>
           <InputBase
             className={classes.searchInput}
             placeholder="Search contacts"
+            value={searchQuery}
+            onChange={searchContact}
           />
           <Search />
         </Paper>
       </Grid>
-      <Grid item lg={8} md={6} sm={4} xs={3} className={classes.addBtnWrapper}>
-        <Button variant="contained" className={classes.addBtn}>
-          + <Hidden xsDown>Add Contact</Hidden>
+      <Grid item lg={4} md={6} sm={4} xs={12} className={classes.btnWrapper}>
+        <Button variant="contained" className={classes.actionBtn} onClick={addContact}>
+          + <Hidden only="sm">Add<Hidden smDown> Contact</Hidden></Hidden>
         </Button>
+        {
+          someSelected &&
+          <Button variant="contained" className={classes.actionBtn} onClick={deleteContact}>
+            <Delete style={{ fontSize: 16 }} /> <Hidden only="sm">Delete</Hidden>
+          </Button>
+        }
       </Grid>
     </Grid>
   );

@@ -1,28 +1,49 @@
 import React from 'react';
+import {
+  Hidden,
+} from '@material-ui/core';
 import ContactListItem from '../components/ContactListItem';
+import ContactForm from '../components/ContactForm';
 
-const ContactListBody = ({ contacts, selectedContact, selectContact, editContact, isEditing }) => {
+const ContactListBody = ({ contacts, selectedContact, selectContact, editContact, isEditing, updateContact, isAdding, saveContact, checkContact }) => {
   return (
     <>
       {
-        contacts.map((contact, index) =>
-          <ContactListItem
-            index={index}
-            contact={contact}
-            key={contact.name}
-            active={index === selectedContact}
-            selectContact={selectContact}
-            editContact={editContact}
-            isEditing={isEditing}
-          />
-        )
+        contacts.map((contact) => {
+          return (
+            <React.Fragment key={contact.id}>
+              <ContactListItem
+                contact={contact}
+                active={contact.id === selectedContact.id}
+                selectContact={selectContact}
+                editContact={editContact}
+                saveContact={saveContact}
+                checkContact={checkContact}
+              />
+              {
+                contact.id === selectedContact.id &&
+                <Hidden lgUp>
+                  <ContactForm selectedContact={contact} editable={isEditing} editContact={editContact} updateContact={updateContact} />
+                </Hidden>
+              }
+            </React.Fragment>
+          );
+        })
       }
 
-      <ContactListItem
-        contact={contacts[0]}
-        isNewContact
-        active={true}
-      />
+      {
+        isAdding &&
+        <ContactListItem
+          contact={{"id" : contacts.length}}
+          key={'newContact'}
+          active={true}
+          selectContact={selectContact}
+          editContact={editContact}
+          isEditing={isEditing}
+          saveContact={saveContact}
+          isNewContact={isAdding}
+        />
+      }
     </>
   );
 };
