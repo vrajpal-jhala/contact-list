@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/contact-app/static/css/main.56fdac5e.chunk.css",
+    "main.js": "/contact-app/static/js/main.0f9c1663.chunk.js",
+    "main.js.map": "/contact-app/static/js/main.0f9c1663.chunk.js.map",
+    "runtime-main.js": "/contact-app/static/js/runtime-main.cb2acef6.js",
+    "runtime-main.js.map": "/contact-app/static/js/runtime-main.cb2acef6.js.map",
+    "static/css/2.b4d48986.chunk.css": "/contact-app/static/css/2.b4d48986.chunk.css",
+    "static/js/2.d0db10e7.chunk.js": "/contact-app/static/js/2.d0db10e7.chunk.js",
+    "static/js/2.d0db10e7.chunk.js.map": "/contact-app/static/js/2.d0db10e7.chunk.js.map",
+    "index.html": "/contact-app/index.html",
+    "precache-manifest.fb9e18fbac96475d928501180c0e355e.js": "/contact-app/precache-manifest.fb9e18fbac96475d928501180c0e355e.js",
+    "service-worker.js": "/contact-app/service-worker.js",
+    "static/css/2.b4d48986.chunk.css.map": "/contact-app/static/css/2.b4d48986.chunk.css.map",
+    "static/css/main.56fdac5e.chunk.css.map": "/contact-app/static/css/main.56fdac5e.chunk.css.map",
+    "static/js/2.d0db10e7.chunk.js.LICENSE.txt": "/contact-app/static/js/2.d0db10e7.chunk.js.LICENSE.txt",
+    "static/media/all.min.css": "/contact-app/static/media/fa-solid-900.cdfec5cf.woff",
+    "static/media/index.css": "/contact-app/static/media/roboto-latin-900italic.ebf6d164.woff2"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.cb2acef6.js",
+    "static/css/2.b4d48986.chunk.css",
+    "static/js/2.d0db10e7.chunk.js",
+    "static/css/main.56fdac5e.chunk.css",
+    "static/js/main.0f9c1663.chunk.js"
+  ]
+}
