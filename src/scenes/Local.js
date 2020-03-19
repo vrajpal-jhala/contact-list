@@ -127,11 +127,11 @@ class Local extends React.Component {
   }
 
   setSelectedContact = (id) => {
-    const { data, selectedContact, editable } = this.state;
-    const isAdding = id === contacts.length + 1;
+    const { data, isAdding, selectedContact, editable } = this.state;
+    const stillAdding = isAdding && id === selectedContact.id;
     this.setState({
-      selectedContact: isAdding ? selectedContact : data.find(contact => contact.id === id),
-      isAdding: isAdding,
+      selectedContact: stillAdding ? selectedContact : data.find(contact => contact.id === id),
+      isAdding: stillAdding,
       editable: editable && id === selectedContact.id,
     });
   };
