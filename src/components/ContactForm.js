@@ -83,6 +83,105 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
 
   const { register, handleSubmit, errors } = useForm();
 
+  const validations = {
+    name: {
+      required: {
+        value: true,
+        message: "This field is required"
+      },
+      pattern: {
+        value: /[^\s]+/,
+        message: "Enter valid name"
+      },
+      minLength: {
+        value: 2,
+        message: "Enter valid name",
+      },
+      maxLength: {
+        value: 40,
+        message: "Enter valid name",
+      },
+    },
+    about: {
+      required: {
+        value: true,
+        message: "This field is required"
+      },
+      pattern: {
+        value: /[^\s]+/,
+        message: "Enter valid about"
+      },
+      minLength: {
+        value: 10,
+        message: "Enter valid about",
+      },
+      maxLength: {
+        value: 50,
+        message: "Enter valid about",
+      },
+    },
+    email: {
+      required: {
+        value: true,
+        message: "This field is required"
+      },
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+        message: "Invalid email address"
+      },
+      maxLength: {
+        value: 60,
+        message: "Enter valid email",
+      },
+    },
+    phone: {
+      required: {
+        value: true,
+        message: "This field is required"
+      },
+      pattern: {
+        value: /[+][(](\d{1,5})[)][\s](\d{6,9})$/,
+        message: "Enter valid phone"
+      },
+    },
+    company: {
+      required: {
+        value: true,
+        message: "This field is required"
+      },
+      pattern: {
+        value: /[^\s]+/,
+        message: "Enter valid company name"
+      },
+      minLength: {
+        value: 5,
+        message: "Enter valid company name",
+      },
+      maxLength: {
+        value: 40,
+        message: "Enter valid company name",
+      },
+    },
+    address: {
+      required: {
+        value: true,
+        message: "This field is required"
+      },
+      pattern: {
+        value: /[^\s]+/,
+        message: "Enter valid address"
+      },
+      minLength: {
+        value: 10,
+        message: "Enter valid address",
+      },
+      maxLength: {
+        value: 100,
+        message: "Enter valid address",
+      },
+    },
+  };
+
   const onSubmit = (data) => { updateContact(data) }
 
   const display = (field, input = false) => {
@@ -115,25 +214,8 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                   editable ?
                     <Input
                       fullWidth
-                      error={errors.name !== undefined ? true : false}
-                      inputRef={register({
-                        required: {
-                          value: true,
-                          message: "This field is required"
-                        },
-                        pattern: {
-                          value: /[^\s]+/,
-                          message: "Enter valid name"
-                        },
-                        minLength: {
-                          value: 2,
-                          message: "Enter valid name",
-                        },
-                        maxLength: {
-                          value: 40,
-                          message: "Enter valid name",
-                        },
-                      })}
+                      error={errors.name !== undefined}
+                      inputRef={register(validations.name)}
                       defaultValue={display("name", editable)}
                       name="name"
                     /> :
@@ -155,25 +237,8 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                         fullWidth
                         disabled={!editable}
                         disableUnderline={!editable}
-                        error={errors.about !== undefined ? true : false}
-                        inputRef={register({
-                          required: {
-                            value: true,
-                            message: "This field is required"
-                          },
-                          pattern: {
-                            value: /[^\s]+/,
-                            message: "Enter valid about"
-                          },
-                          minLength: {
-                            value: 10,
-                            message: "Enter valid about",
-                          },
-                          maxLength: {
-                            value: 50,
-                            message: "Enter valid about",
-                          },
-                        })}
+                        error={errors.about !== undefined}
+                        inputRef={register(validations.about)}
                         defaultValue={display("about", editable)}
                         name="about"
                       /> :
@@ -194,21 +259,8 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                       fullWidth
                       disabled={!editable}
                       disableUnderline={!editable}
-                      error={errors.email !== undefined ? true : false}
-                      inputRef={register({
-                        required: {
-                          value: true,
-                          message: "This field is required"
-                        },
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                          message: "Invalid email address"
-                        },
-                        maxLength: {
-                          value: 60,
-                          message: "Enter valid email",
-                        },
-                      })}
+                      error={errors.email !== undefined}
+                      inputRef={register(validations.email)}
                       defaultValue={display("email", editable)}
                       name="email"
                     /> :
@@ -228,17 +280,8 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                       fullWidth
                       disabled={!editable}
                       disableUnderline={!editable}
-                      error={errors.phone !== undefined ? true : false}
-                      inputRef={register({
-                        required: {
-                          value: true,
-                          message: "This field is required"
-                        },
-                        pattern: {
-                          value: /[+][(](\d{1,5})[)][\s](\d{6,9})$/,
-                          message: "Enter valid phone"
-                        },
-                      })}
+                      error={errors.phone !== undefined}
+                      inputRef={register(validations.phone)}
                       defaultValue={display("phone", editable)}
                       name="phone"
                     /> :
@@ -258,25 +301,8 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                       fullWidth
                       disabled={!editable}
                       disableUnderline={!editable}
-                      error={errors.company !== undefined ? true : false}
-                      inputRef={register({
-                        required: {
-                          value: true,
-                          message: "This field is required"
-                        },
-                        pattern: {
-                          value: /[^\s]+/,
-                          message: "Enter valid company name"
-                        },
-                        minLength: {
-                          value: 5,
-                          message: "Enter valid company name",
-                        },
-                        maxLength: {
-                          value: 40,
-                          message: "Enter valid company name",
-                        },
-                      })}
+                      error={errors.company !== undefined}
+                      inputRef={register(validations.company)}
                       defaultValue={display("company", editable)}
                       name="company"
                     /> :
@@ -296,25 +322,8 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                       fullWidth
                       disabled={!editable}
                       disableUnderline={!editable}
-                      error={errors.address !== undefined ? true : false}
-                      inputRef={register({
-                        required: {
-                          value: true,
-                          message: "This field is required"
-                        },
-                        pattern: {
-                          value: /[^\s]+/,
-                          message: "Enter valid address"
-                        },
-                        minLength: {
-                          value: 10,
-                          message: "Enter valid address",
-                        },
-                        maxLength: {
-                          value: 100,
-                          message: "Enter valid address",
-                        },
-                      })}
+                      error={errors.address !== undefined}
+                      inputRef={register(validations.address)}
                       defaultValue={display("address", editable)}
                       name="address"
                     /> :

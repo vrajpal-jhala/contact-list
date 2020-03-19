@@ -27,22 +27,22 @@ const ContactList = ({ contacts, selectedContact, selectContact, editContact, is
         selectAll={selectAll}
         deselectAll={deselectAll}
       />
+      <ContactListBody
+        contacts={contacts}
+        selectedContact={selectedContact}
+        selectContact={selectContact}
+        editContact={editContact}
+        isEditing={isEditing}
+        updateContact={updateContact}
+        isAdding={isAdding}
+        saveContact={saveContact}
+        checkContact={checkContact}
+      />
       {
-        contacts.length > 0 ?
-          <ContactListBody
-            contacts={contacts}
-            selectedContact={selectedContact}
-            selectContact={selectContact}
-            editContact={editContact}
-            isEditing={isEditing}
-            updateContact={updateContact}
-            isAdding={isAdding}
-            saveContact={saveContact}
-            checkContact={checkContact}
-          /> :
-          <h3 className={classes.noContacts}>
-            No Contacts
-          </h3>
+        contacts.length === 0 &&
+        <h3 className={classes.noContacts}>
+          No Contacts
+        </h3>
       }
     </Grid>
   );

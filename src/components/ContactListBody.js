@@ -37,9 +37,6 @@ const ContactListBody = ({ contacts, selectedContact, selectContact, editContact
           contact={selectedContact}
           key={'newContact'}
           active={true}
-          selectContact={() => {}}
-          editContact={() => {}}
-          isEditing={isEditing}
           saveContact={saveContact}
           isNewContact={isAdding}
         />

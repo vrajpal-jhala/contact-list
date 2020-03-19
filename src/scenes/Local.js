@@ -139,8 +139,9 @@ class Local extends React.Component {
   setEditable = (id) => {
     const { data, selectedContact } = this.state;
     this.setState({
-      editable: id === selectedContact.id,
+      editable: (id === selectedContact.id || selectedContact.id === undefined),
       selectedContact: data.find(contact => contact.id === id),
+      isAdding: false,
     });
   };
 
@@ -156,16 +157,17 @@ class Local extends React.Component {
 
   addContact = () => {
     this.setState({
+      editable: false,
       isAdding: true,
       selectedContact: { "id": contacts.length + 1 },
     });
   }
 
-  saveContact = (newContactName) => {
+  saveContact = (newContact) => {
     const { selectedContact } = this.state;
     contacts.push({
       ...selectedContact,
-      "name": newContactName,
+      ...newContact,
     });
 
     this.setState({

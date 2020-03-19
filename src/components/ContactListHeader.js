@@ -27,9 +27,9 @@ const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll }
             checked={allSelected || someSelected}
           />
         </Grid>
-        <Grid item md={5} xs={10} sm={9}>Basic Info</Grid>
+        <Grid item md={5} xs={10} sm={9}>Name</Grid>
         <Hidden smDown>
-          <Grid item md={5}>Company</Grid>
+          <Grid item md={5}>Email</Grid>
         </Hidden>
         <Hidden xsDown>
           <Grid item md={1} sm={1}>Edit</Grid>
