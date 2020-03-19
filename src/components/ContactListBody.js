@@ -34,11 +34,11 @@ const ContactListBody = ({ contacts, selectedContact, selectContact, editContact
       {
         isAdding &&
         <ContactListItem
-          contact={{"id" : contacts.length}}
+          contact={selectedContact}
           key={'newContact'}
           active={true}
-          selectContact={selectContact}
-          editContact={editContact}
+          selectContact={() => {}}
+          editContact={() => {}}
           isEditing={isEditing}
           saveContact={saveContact}
           isNewContact={isAdding}

@@ -1,6 +1,4 @@
-import React, {
-  useState,
-} from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
   makeStyles,
@@ -66,7 +64,7 @@ const useStyle = makeStyles(theme => ({
   },
   formRow: {
     alignItems: "baseline",
-    padding: '20px 0px',
+    padding: '10px 0px',
     [theme.breakpoints.only("xs")]: {
       padding: '10px 0px',
     }
@@ -83,23 +81,12 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
 
   const classes = useStyle();
 
-  const { id, avatar, name, about } = selectedContact || {};
-
   const { register, handleSubmit, errors } = useForm();
 
-  const [updatedContact, setUpdatedContact] = useState(selectedContact);
-
-  const onSubmit = data => { console.log(data) }
-
-  const handleChange = (event) => {
-    setUpdatedContact({
-      ...updatedContact,
-      [event.target.name]: event.target.value
-    });
-  }
+  const onSubmit = (data) => { updateContact(data) }
 
   const display = (field, input = false) => {
-    return field === undefined || selectedContact === undefined ? (input ? '' : 'N/A') : selectedContact[field];
+    return input ? selectedContact[field] : selectedContact[field] === '' || selectedContact[field] === undefined ? 'N/A' : selectedContact[field];
   };
 
   return (
@@ -107,16 +94,16 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
       <Grid item container md={12} className={classes.formWrapper}>
         <Box className={classes.contactForm}>
           <Hidden smUp>
-            <IconButton size="small" className={classes.editBtn} onClick={() => editContact(id)}>
+            <IconButton size="small" className={classes.editBtn} onClick={() => editContact(selectedContact.id)}>
               <Edit />
             </IconButton>
           </Hidden>
           <Box className={classes.formHeader}>
-            <Avatar className={classes.avatar} src={avatar}>
-              {display(name).split(" ").map((n) => n[0])}
+            <Avatar className={classes.avatar} src={selectedContact.avatar}>
+              {display("name").split(" ").map((n) => n[0])}
             </Avatar>
-            <h2 className={classes.noBottomMargin}>{display(name)}</h2>
-            <small>{display(about)}</small>
+            <h2 className={classes.noBottomMargin}>{display("name")}</h2>
+            <small>{display("about")}</small>
           </Box>
           <Grid container>
             <Grid item container className={classes.formRow}>
@@ -124,16 +111,34 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                 Full Name:
               </Grid>
               <Grid item xs={12} sm={9}>
-                <Input
-                  fullWidth
-                  disabled={!editable}
-                  disableUnderline={!editable}
-                  error={errors.name !== undefined ? true : false}
-                  inputRef={register({ required: { value: true, message: "This field is required" } })}
-                  value={display("name", editable)}
-                  name="name"
-                  onChange={(event) => handleChange(event)}
-                />
+                {
+                  editable ?
+                    <Input
+                      fullWidth
+                      error={errors.name !== undefined ? true : false}
+                      inputRef={register({
+                        required: {
+                          value: true,
+                          message: "This field is required"
+                        },
+                        pattern: {
+                          value: /[^\s]+/,
+                          message: "Enter valid name"
+                        },
+                        minLength: {
+                          value: 2,
+                          message: "Enter valid name",
+                        },
+                        maxLength: {
+                          value: 40,
+                          message: "Enter valid name",
+                        },
+                      })}
+                      defaultValue={display("name", editable)}
+                      name="name"
+                    /> :
+                    display("name", false)
+                }
                 <FormHelperText error>{errors.name ? errors.name.message : ' '}</FormHelperText>
               </Grid>
             </Grid>
@@ -144,16 +149,36 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                   About:
                   </Grid>
                 <Grid item xs={12} sm={9}>
-                  <Input
-                    fullWidth
-                    disabled={!editable}
-                    disableUnderline={!editable}
-                    error={errors.about !== undefined ? true : false}
-                    inputRef={register({ required: { value: true, message: "This field is required" } })}
-                    value={display("about", editable)}
-                    name="about"
-                    onChange={(event) => handleChange(event)}
-                  />
+                  {
+                    editable ?
+                      <Input
+                        fullWidth
+                        disabled={!editable}
+                        disableUnderline={!editable}
+                        error={errors.about !== undefined ? true : false}
+                        inputRef={register({
+                          required: {
+                            value: true,
+                            message: "This field is required"
+                          },
+                          pattern: {
+                            value: /[^\s]+/,
+                            message: "Enter valid about"
+                          },
+                          minLength: {
+                            value: 10,
+                            message: "Enter valid about",
+                          },
+                          maxLength: {
+                            value: 50,
+                            message: "Enter valid about",
+                          },
+                        })}
+                        defaultValue={display("about", editable)}
+                        name="about"
+                      /> :
+                      display("about", false)
+                  }
                   <FormHelperText error>{errors.about ? errors.about.message : ' '}</FormHelperText>
                 </Grid>
               </Grid>
@@ -163,16 +188,32 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                 Email:
               </Grid>
               <Grid item xs={12} sm={9}>
-                <Input
-                  fullWidth
-                  disabled={!editable}
-                  disableUnderline={!editable}
-                  error={errors.email !== undefined ? true : false}
-                  inputRef={register({ required: { value: true, message: "This field is required" } })}
-                  value={display("email", editable)}
-                  name="email"
-                  onChange={(event) => handleChange(event)}
-                />
+                {
+                  editable ?
+                    <Input
+                      fullWidth
+                      disabled={!editable}
+                      disableUnderline={!editable}
+                      error={errors.email !== undefined ? true : false}
+                      inputRef={register({
+                        required: {
+                          value: true,
+                          message: "This field is required"
+                        },
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                          message: "Invalid email address"
+                        },
+                        maxLength: {
+                          value: 60,
+                          message: "Enter valid email",
+                        },
+                      })}
+                      defaultValue={display("email", editable)}
+                      name="email"
+                    /> :
+                    display("email", false)
+                }
                 <FormHelperText error>{errors.email ? errors.email.message : ' '}</FormHelperText>
               </Grid>
             </Grid>
@@ -181,16 +222,28 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                 Phone:
               </Grid>
               <Grid item xs={12} sm={9}>
-                <Input
-                  fullWidth
-                  disabled={!editable}
-                  disableUnderline={!editable}
-                  error={errors.phone !== undefined ? true : false}
-                  inputRef={register({ required: { value: true, message: "This field is required" } })}
-                  value={display("phone", editable)}
-                  name="phone"
-                  onChange={(event) => handleChange(event)}
-                />
+                {
+                  editable ?
+                    <Input
+                      fullWidth
+                      disabled={!editable}
+                      disableUnderline={!editable}
+                      error={errors.phone !== undefined ? true : false}
+                      inputRef={register({
+                        required: {
+                          value: true,
+                          message: "This field is required"
+                        },
+                        pattern: {
+                          value: /[+][(](\d{1,5})[)][\s](\d{6,9})$/,
+                          message: "Enter valid phone"
+                        },
+                      })}
+                      defaultValue={display("phone", editable)}
+                      name="phone"
+                    /> :
+                    display("phone", false)
+                }
                 <FormHelperText error>{errors.phone ? errors.phone.message : ' '}</FormHelperText>
               </Grid>
             </Grid>
@@ -199,16 +252,36 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                 Company:
               </Grid>
               <Grid item xs={12} sm={9}>
-                <Input
-                  fullWidth
-                  disabled={!editable}
-                  disableUnderline={!editable}
-                  error={errors.company !== undefined ? true : false}
-                  inputRef={register({ required: { value: true, message: "This field is required" } })}
-                  value={display("company", editable)}
-                  name="company"
-                  onChange={(event) => handleChange(event)}
-                />
+                {
+                  editable ?
+                    <Input
+                      fullWidth
+                      disabled={!editable}
+                      disableUnderline={!editable}
+                      error={errors.company !== undefined ? true : false}
+                      inputRef={register({
+                        required: {
+                          value: true,
+                          message: "This field is required"
+                        },
+                        pattern: {
+                          value: /[^\s]+/,
+                          message: "Enter valid company name"
+                        },
+                        minLength: {
+                          value: 5,
+                          message: "Enter valid company name",
+                        },
+                        maxLength: {
+                          value: 40,
+                          message: "Enter valid company name",
+                        },
+                      })}
+                      defaultValue={display("company", editable)}
+                      name="company"
+                    /> :
+                    display("company", false)
+                }
                 <FormHelperText error>{errors.company ? errors.company.message : ' '}</FormHelperText>
               </Grid>
             </Grid>
@@ -217,16 +290,36 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
                 Address:
               </Grid>
               <Grid item xs={12} sm={9}>
-                <Input
-                  fullWidth
-                  disabled={!editable}
-                  disableUnderline={!editable}
-                  error={errors.address !== undefined ? true : false}
-                  inputRef={register({ required: { value: true, message: "This field is required" } })}
-                  value={display("address", editable)}
-                  name="address"
-                  onChange={(event) => handleChange(event)}
-                />
+                {
+                  editable ?
+                    <Input
+                      fullWidth
+                      disabled={!editable}
+                      disableUnderline={!editable}
+                      error={errors.address !== undefined ? true : false}
+                      inputRef={register({
+                        required: {
+                          value: true,
+                          message: "This field is required"
+                        },
+                        pattern: {
+                          value: /[^\s]+/,
+                          message: "Enter valid address"
+                        },
+                        minLength: {
+                          value: 10,
+                          message: "Enter valid address",
+                        },
+                        maxLength: {
+                          value: 100,
+                          message: "Enter valid address",
+                        },
+                      })}
+                      defaultValue={display("address", editable)}
+                      name="address"
+                    /> :
+                    display("address", false)
+                }
                 <FormHelperText error>{errors.address ? errors.address.message : ' '}</FormHelperText>
               </Grid>
             </Grid>

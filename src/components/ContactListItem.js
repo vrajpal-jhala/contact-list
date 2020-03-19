@@ -1,6 +1,7 @@
 import React, {
   useState
 } from 'react';
+import { useForm } from 'react-hook-form';
 import clsx from "clsx";
 import {
   Grid,
@@ -11,6 +12,7 @@ import {
   makeStyles,
   Hidden,
   Input,
+  FormHelperText,
 } from '@material-ui/core';
 import {
   Edit,
@@ -53,6 +55,8 @@ const useStyle = makeStyles(theme => ({
 const ContactListItem = ({ contact, selectContact, active, editContact, isNewContact, saveContact, checkContact }) => {
   const classes = useStyle();
 
+  const { register, handleSubmit, errors } = useForm();
+
   const { id, avatar, name, email, company, checked } = contact;
 
   const [newContactName, setNewContactName] = useState('');
@@ -68,6 +72,10 @@ const ContactListItem = ({ contact, selectContact, active, editContact, isNewCon
       colour += ('00' + value.toString(16)).substr(-2);
     }
     return colour + 'bf';
+  }
+
+  const onSave = () => {
+    saveContact(newContactName);
   }
 
   return (
@@ -105,7 +113,39 @@ const ContactListItem = ({ contact, selectContact, active, editContact, isNewCon
             <h3 className={classes.noMargin}>
               {
                 isNewContact ?
-                  <Input placeholder="John Doe" defaultValue={newContactName} onClick={(event) => event.stopPropagation()} onChange={(event) => setNewContactName(event.target.value)} /> :
+                  (
+                    <>
+                      <Input
+                        name="name"
+                        error={errors.name !== undefined ? true : false}
+                        inputRef={register({
+                          required: {
+                            value: true,
+                            message: "This field is required"
+                          },
+                          pattern: {
+                            value: /[^\s]+/,
+                            message: "Enter valid name"
+                          },
+                          minLength: {
+                            value: 2,
+                            message: "Enter valid name",
+                          },
+                          maxLength: {
+                            value: 40,
+                            message: "Enter valid name",
+                          },
+                        })}
+                        placeholder="John Doe"
+                        defaultValue={newContactName}
+                        onClick={(event) => event.stopPropagation()}
+                        onChange={(event) => setNewContactName(event.target.value)}
+                      />
+                      <FormHelperText error>
+                        {errors.name ? errors.name.message : ''}
+                      </FormHelperText>
+                    </>
+                  ) :
                   name
               }
             </h3>
@@ -134,7 +174,7 @@ const ContactListItem = ({ contact, selectContact, active, editContact, isNewCon
         <Grid item md={1} sm={1}>
           {
             isNewContact ?
-              <IconButton size="small" className={classes.editBtn} onClick={(event) => { saveContact(newContactName); event.stopPropagation() }}>
+              <IconButton size="small" className={classes.editBtn} onClick={handleSubmit(onSave)}>
                 <Check />
               </IconButton> :
               <IconButton size="small" className={classes.editBtn} onClick={(event) => { editContact(id); event.stopPropagation() }}>

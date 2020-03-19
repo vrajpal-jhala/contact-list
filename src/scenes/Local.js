@@ -128,7 +128,7 @@ class Local extends React.Component {
 
   setSelectedContact = (id) => {
     const { data, selectedContact, editable } = this.state;
-    const isAdding = id === data.length;
+    const isAdding = id === contacts.length + 1;
     this.setState({
       selectedContact: isAdding ? selectedContact : data.find(contact => contact.id === id),
       isAdding: isAdding,
@@ -154,23 +154,24 @@ class Local extends React.Component {
     });
   };
 
-  saveContact = (newContactName) => {
-    var { data } = this.state;
-    data.push({
-      "id": data.length,
-      "name": newContactName,
-    });
+  addContact = () => {
     this.setState({
-      data: data,
-      isAdding: false,
+      isAdding: true,
+      selectedContact: { "id": contacts.length + 1 },
     });
   }
 
-  addContact = () => {
-    const { data } = this.state;
+  saveContact = (newContactName) => {
+    const { selectedContact } = this.state;
+    contacts.push({
+      ...selectedContact,
+      "name": newContactName,
+    });
+
     this.setState({
-      isAdding: true,
-      selectedContact: { "id": data.length },
+      data: contacts,
+      isAdding: false,
+      searchQuery: '',
     });
   }
 
@@ -265,7 +266,7 @@ class Local extends React.Component {
             someSelected={someSelected}
           />
           <Hidden mdDown>
-            <ContactForm selectedContact={data.find(contact => contact.id === selectedContact.id)} editable={editable} updateContact={this.updateContact} />
+            <ContactForm selectedContact={data.find(contact => contact.id === selectedContact.id) || {}} editable={editable} updateContact={this.updateContact} />
           </Hidden>
         </Grid>
       </Grid >
