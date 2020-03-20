@@ -7,13 +7,13 @@ import {
   Avatar,
   Input,
   Fab,
-  IconButton,
-  Hidden,
   FormHelperText,
 } from '@material-ui/core';
 import {
   Check,
   Edit,
+  Close,
+  ArrowBack,
 } from '@material-ui/icons';
 
 const useStyle = makeStyles(theme => ({
@@ -73,13 +73,48 @@ const useStyle = makeStyles(theme => ({
     background: 'linear-gradient(to right, #fa8569, #ff4b6e)',
     color: '#ffffffbf',
     position: 'absolute',
-    right: 20
+    right: 30,
+    [theme.breakpoints.only("xs")]: {
+      right: 20,
+    }
+  },
+  cancelBtn: {
+    background: 'linear-gradient(to right, #ffffff, #e8ecef)',
+    position: 'absolute',
+    color: '#000000fb',
+    right: 30,
+    [theme.breakpoints.only("xs")]: {
+      right: 20,
+    }
+  },
+  backBtn: {
+    background: 'linear-gradient(to right, #ffffff, #e8ecef)',
+    position: 'absolute',
+    color: '#000000fb',
+    left: 30,
+    [theme.breakpoints.only("xs")]: {
+      left: 20,
+    }
   }
 }));
 
-const ContactForm = ({ selectedContact, editable, updateContact, editContact }) => {
+const ContactForm = ({ selectedContact, editable, updateContact, editContact, deselectContact }) => {
 
   const classes = useStyle();
+
+  const stringToColour = (str) => {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    var colour = '#';
+    for (i = 0; i < 3; i++) {
+      var value = (hash >> (i * 8)) & 0xFF;
+      colour += ('00' + value.toString(16)).substr(-2);
+    }
+
+    return colour + 'bf';
+  }
 
   const { register, handleSubmit, errors } = useForm();
 
@@ -95,11 +130,11 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
       },
       minLength: {
         value: 2,
-        message: "Enter valid name",
+        message: "Enter at least 2 characters",
       },
       maxLength: {
         value: 40,
-        message: "Enter valid name",
+        message: "Enter no more than 40 characters",
       },
     },
     about: {
@@ -113,11 +148,11 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
       },
       minLength: {
         value: 10,
-        message: "Enter valid about",
+        message: "Enter at least 10 characters",
       },
       maxLength: {
         value: 50,
-        message: "Enter valid about",
+        message: "Enter no more than 50 characters",
       },
     },
     email: {
@@ -131,7 +166,7 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
       },
       maxLength: {
         value: 60,
-        message: "Enter valid email",
+        message: "Enter no more than 60 characters",
       },
     },
     phone: {
@@ -140,7 +175,7 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
         message: "This field is required"
       },
       pattern: {
-        value: /[+][(](\d{1,5})[)][\s](\d{6,9})$/,
+        value: /[+][(](\d{1,5})[)][\s](\d{6,10})$/,
         message: "Enter valid phone"
       },
     },
@@ -155,11 +190,11 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
       },
       minLength: {
         value: 5,
-        message: "Enter valid company name",
+        message: "Enter at least 5 characters",
       },
       maxLength: {
         value: 40,
-        message: "Enter valid company name",
+        message: "Enter no more than 40 characters",
       },
     },
     address: {
@@ -173,11 +208,11 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
       },
       minLength: {
         value: 10,
-        message: "Enter valid address",
+        message: "Enter  at least 10 characters",
       },
       maxLength: {
         value: 100,
-        message: "Enter valid address",
+        message: "Enter no more than 100 characters",
       },
     },
   };
@@ -192,13 +227,27 @@ const ContactForm = ({ selectedContact, editable, updateContact, editContact }) 
     <Grid item lg={6} xs={12}>
       <Grid item container md={12} className={classes.formWrapper}>
         <Box className={classes.contactForm}>
-          <Hidden smUp>
-            <IconButton size="small" className={classes.editBtn} onClick={() => editContact(selectedContact.id)}>
-              <Edit />
-            </IconButton>
-          </Hidden>
+          {
+            selectedContact.id > 0 &&
+            <>
+              <Fab size="small" className={classes.backBtn} onClick={() => deselectContact(selectedContact.id)}>
+                <ArrowBack />
+              </Fab>
+              <Fab size="small" className={editable ? classes.cancelBtn : classes.editBtn} onClick={() => editContact(selectedContact.id)}>
+                {
+                  editable ? <Close /> : <Edit />
+                }
+              </Fab>
+            </>
+          }
           <Box className={classes.formHeader}>
-            <Avatar className={classes.avatar} src={selectedContact.avatar}>
+            <Avatar
+              className={classes.avatar}
+              src={selectedContact.avatar}
+              style={{
+                backgroundColor: stringToColour(display("name") + display("email"))
+              }}
+            >
               {display("name").split(" ").map((n) => n[0])}
             </Avatar>
             <h2 className={classes.noBottomMargin}>{display("name")}</h2>

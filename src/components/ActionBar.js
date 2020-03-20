@@ -78,6 +78,7 @@ const ActionBar = ({ addContact, someSelected, deleteContact, searchQuery, searc
             placeholder="Search contacts"
             value={searchQuery}
             onChange={searchContact}
+            inputProps={{ maxLength: 40 }}
           />
           <Search />
         </Paper>
@@ -86,12 +87,9 @@ const ActionBar = ({ addContact, someSelected, deleteContact, searchQuery, searc
         <Button variant="contained" className={classes.actionBtn} onClick={addContact}>
           + <Hidden only="sm">Add<Hidden smDown> Contact</Hidden></Hidden>
         </Button>
-        {
-          someSelected &&
-          <Button variant="contained" className={classes.actionBtn} onClick={deleteContact}>
-            <Delete style={{ fontSize: 16 }} /> <Hidden only="sm">Delete</Hidden>
-          </Button>
-        }
+        <Button variant="contained" className={classes.actionBtn} onClick={deleteContact} disabled={!someSelected} >
+          <Delete style={{ fontSize: 16 }} /> <Hidden only="sm">Delete</Hidden>
+        </Button>
       </Grid>
     </Grid>
   );

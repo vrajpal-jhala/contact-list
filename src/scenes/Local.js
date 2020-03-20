@@ -136,10 +136,17 @@ class Local extends React.Component {
     });
   };
 
-  setEditable = (id) => {
-    const { data, selectedContact } = this.state;
+  deselectContact = () => {
     this.setState({
-      editable: (id === selectedContact.id || selectedContact.id === undefined),
+      selectedContact: {},
+      editable: false,
+    });
+  }
+
+  setEditable = (id) => {
+    const { data, editable } = this.state;
+    this.setState({
+      editable: !editable,
       selectedContact: data.find(contact => contact.id === id),
       isAdding: false,
     });
@@ -160,6 +167,13 @@ class Local extends React.Component {
       editable: false,
       isAdding: true,
       selectedContact: { "id": contacts[contacts.length - 1].id + 1 },
+    });
+  }
+
+  cancelAddContact = () => {
+    this.setState({
+      isAdding: false,
+      selectedContact: {},
     });
   }
 
@@ -266,9 +280,17 @@ class Local extends React.Component {
             deselectAll={this.deselectAll}
             allSelected={allSelected}
             someSelected={someSelected}
+            deselectContact={this.deselectContact}
+            cancelAddContact={this.cancelAddContact}
           />
           <Hidden mdDown>
-            <ContactForm selectedContact={data.find(contact => contact.id === selectedContact.id) || {}} editable={editable} updateContact={this.updateContact} />
+            <ContactForm
+              selectedContact={data.find(contact => contact.id === selectedContact.id) || {}}
+              editable={editable}
+              editContact={this.setEditable}
+              updateContact={this.updateContact}
+              deselectContact={this.deselectContact}
+            />
           </Hidden>
         </Grid>
       </Grid >

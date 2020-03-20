@@ -3,9 +3,11 @@ import {
   Hidden,
 } from '@material-ui/core';
 import ContactListItem from '../components/ContactListItem';
+import NewContactListItem from '../components/NewContactListItem';
 import ContactForm from '../components/ContactForm';
 
-const ContactListBody = ({ contacts, selectedContact, selectContact, editContact, isEditing, updateContact, isAdding, saveContact, checkContact }) => {
+const ContactListBody = ({ contacts, selectedContact, selectContact, editContact, isEditing, updateContact, isAdding, saveContact, checkContact, deselectContact, cancelAddContact }) => {
+
   return (
     <>
       {
@@ -16,14 +18,19 @@ const ContactListBody = ({ contacts, selectedContact, selectContact, editContact
                 contact={contact}
                 active={contact.id === selectedContact.id}
                 selectContact={selectContact}
-                editContact={editContact}
                 saveContact={saveContact}
                 checkContact={checkContact}
               />
               {
                 contact.id === selectedContact.id &&
                 <Hidden lgUp>
-                  <ContactForm selectedContact={contact} editable={isEditing} editContact={editContact} updateContact={updateContact} />
+                  <ContactForm
+                    selectedContact={contact}
+                    editable={isEditing}
+                    editContact={editContact}
+                    updateContact={updateContact}
+                    deselectContact={deselectContact}
+                  />
                 </Hidden>
               }
             </React.Fragment>
@@ -33,12 +40,9 @@ const ContactListBody = ({ contacts, selectedContact, selectContact, editContact
 
       {
         isAdding &&
-        <ContactListItem
-          contact={selectedContact}
-          key={'newContact'}
-          active={true}
+        <NewContactListItem
           saveContact={saveContact}
-          isNewContact={isAdding}
+          cancelAddContact={cancelAddContact}
         />
       }
     </>

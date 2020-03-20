@@ -15,7 +15,7 @@ const useStyle = makeStyles(theme => ({
   }
 }));
 
-const ContactList = ({ contacts, selectedContact, selectContact, editContact, isEditing, updateContact, saveContact, isAdding, checkContact, someSelected, allSelected, selectAll, deselectAll }) => {
+const ContactList = ({ contacts, selectedContact, selectContact, editContact, isEditing, updateContact, saveContact, isAdding, checkContact, someSelected, allSelected, selectAll, deselectAll, deselectContact, cancelAddContact }) => {
 
   const classes = useStyle();
 
@@ -37,6 +37,8 @@ const ContactList = ({ contacts, selectedContact, selectContact, editContact, is
         isAdding={isAdding}
         saveContact={saveContact}
         checkContact={checkContact}
+        deselectContact={deselectContact}
+        cancelAddContact={cancelAddContact}
       />
       {
         contacts.length === 0 &&

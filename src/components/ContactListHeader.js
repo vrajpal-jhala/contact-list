@@ -29,10 +29,7 @@ const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll }
         </Grid>
         <Grid item md={5} xs={10} sm={9}>Name</Grid>
         <Hidden smDown>
-          <Grid item md={5}>Email</Grid>
-        </Hidden>
-        <Hidden xsDown>
-          <Grid item md={1} sm={1}>Edit</Grid>
+          <Grid item md={6}>Email</Grid>
         </Hidden>
       </Grid>
     </Grid>
