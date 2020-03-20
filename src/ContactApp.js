@@ -1,4 +1,10 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  NavLink
+} from "react-router-dom";
 import clsx from 'clsx';
 import AppDrawer from './components/AppDrawer';
 import AppHeader from './components/AppHeader';
@@ -65,7 +71,19 @@ class ContactApp extends React.Component {
           <AppHeader
             handleFullDrawerToggle={this.handleFullDrawerToggle}
           />
-          <Local />
+          <Router>
+            <Switch>
+              <Route path={"/"} key={"Local"}>
+                <Local />
+              </Route>
+              <Route path={"/Twitter"} key={"Twitter"}>
+                <Local />
+              </Route>
+              <Route path={"/GitHub"} key={"GitHub"}>
+                <Local />
+              </Route>
+            </Switch>
+          </Router>
         </div>
       </div>
     );
