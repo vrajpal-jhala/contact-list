@@ -16,6 +16,8 @@ import {
   Hidden,
 } from '@material-ui/core';
 
+import "./style.scss";
+
 const styles = theme => ({
   root: {
     display: 'flex',
@@ -64,7 +66,7 @@ class ContactApp extends React.Component {
         <Hidden smUp>
           <Backdrop open={drawer === "open"} className={classes.backdrop}></Backdrop>
         </Hidden>
-        <Router>
+        <Router basename="/contact-list">
           <AppDrawer
             open={drawer}
             handleMiniDrawerToggle={this.handleMiniDrawerToggle}
@@ -77,10 +79,10 @@ class ContactApp extends React.Component {
               <Route exact path={"/"} key={"Local"}>
                 <Local />
               </Route>
-              <Route exact path={"/Twitter"} key={"Twitter"}>
+              <Route exact path={"/twitter"} key={"Twitter"}>
                 <Twitter />
               </Route>
-              <Route exact path={"/GitHub"} key={"GitHub"}>
+              <Route exact path={"/github"} key={"GitHub"}>
                 <GitHub />
               </Route>
             </Switch>

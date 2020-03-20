@@ -1,4 +1,23 @@
-body{
-    margin: 0px;
-    font-family: Roboto;
+body {
+  margin: 0px;
+  font-family: Roboto;
+}
+
+.menuItem {
+  border-left: 4px solid transparent !important;
+  &:hover,
+  &:focus {
+    border-color: white;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+a.active > .menuItem {
+  border-color: white !important;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+div[class*="drawer"] a {
+  text-decoration: none;
+  color: #ffffffbf;
 }

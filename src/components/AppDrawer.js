@@ -46,13 +46,6 @@ const useStyles = makeStyles(theme => ({
   menu: {
     paddingTop: theme.spacing(4) + 1,
   },
-  leftBorder: {
-    borderLeft: '4px solid transparent',
-    '&:hover, &:focus, &.active': {
-      borderColor: 'white',
-      backgroundColor: 'rgba(0, 0, 0, 0.04)',
-    }
-  },
 }));
 
 const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
@@ -81,11 +74,11 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
         {
           [
             { icon: <Local />, name: "Local", path: "/" },
-            { icon: <Twitter />, name: "Twitter", path: "/Twitter" },
-            { icon: <GitHub />, name: "GitHub", path: "/GitHub" }
+            { icon: <Twitter />, name: "Twitter", path: "/twitter" },
+            { icon: <GitHub />, name: "GitHub", path: "/github" }
           ].map((tab, index) =>
             <NavLink exact to={tab.path} key={tab.name}>
-              <ListItem button key={tab.name} className={clsx(classes.leftBorder, index === 0 && 'active')} >
+              <ListItem button key={tab.name} className="menuItem" >
                 <ListItemIcon className={classes.colorWhite}>{tab.icon}</ListItemIcon>
                 <ListItemText primary={tab.name} />
               </ListItem>
