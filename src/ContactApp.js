@@ -3,12 +3,13 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  NavLink
 } from "react-router-dom";
 import clsx from 'clsx';
 import AppDrawer from './components/AppDrawer';
 import AppHeader from './components/AppHeader';
 import Local from './scenes/Local';
+import Twitter from './scenes/Twitter';
+import GitHub from './scenes/GitHub';
 import {
   withStyles,
   Backdrop,
@@ -63,28 +64,28 @@ class ContactApp extends React.Component {
         <Hidden smUp>
           <Backdrop open={drawer === "open"} className={classes.backdrop}></Backdrop>
         </Hidden>
-        <AppDrawer
-          open={drawer}
-          handleMiniDrawerToggle={this.handleMiniDrawerToggle}
-        />
-        <div className={clsx(classes.content, drawer === "open" && classes.contentPosition)}>
-          <AppHeader
-            handleFullDrawerToggle={this.handleFullDrawerToggle}
+        <Router>
+          <AppDrawer
+            open={drawer}
+            handleMiniDrawerToggle={this.handleMiniDrawerToggle}
           />
-          <Router>
+          <div className={clsx(classes.content, drawer === "open" && classes.contentPosition)}>
+            <AppHeader
+              handleFullDrawerToggle={this.handleFullDrawerToggle}
+            />
             <Switch>
-              <Route path={"/"} key={"Local"}>
+              <Route exact path={"/"} key={"Local"}>
                 <Local />
               </Route>
-              <Route path={"/Twitter"} key={"Twitter"}>
-                <Local />
+              <Route exact path={"/Twitter"} key={"Twitter"}>
+                <Twitter />
               </Route>
-              <Route path={"/GitHub"} key={"GitHub"}>
-                <Local />
+              <Route exact path={"/GitHub"} key={"GitHub"}>
+                <GitHub />
               </Route>
             </Switch>
-          </Router>
-        </div>
+          </div>
+        </Router>
       </div>
     );
   }

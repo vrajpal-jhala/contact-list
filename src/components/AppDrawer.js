@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  NavLink
+} from "react-router-dom";
 import clsx from "clsx";
 import {
   makeStyles,
@@ -77,14 +80,16 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
       <List className={classes.menu}>
         {
           [
-            { icon: <Local />, name: "Local" },
-            { icon: <Twitter />, name: "Twitter" },
-            { icon: <GitHub />, name: "GitHub" }
+            { icon: <Local />, name: "Local", path: "/" },
+            { icon: <Twitter />, name: "Twitter", path: "/Twitter" },
+            { icon: <GitHub />, name: "GitHub", path: "/GitHub" }
           ].map((tab, index) =>
-            <ListItem button key={tab.name} className={clsx(classes.leftBorder, index === 0 && 'active')} >
-              <ListItemIcon className={classes.colorWhite}>{tab.icon}</ListItemIcon>
-              <ListItemText primary={tab.name} />
-            </ListItem>
+            <NavLink exact to={tab.path} key={tab.name}>
+              <ListItem button key={tab.name} className={clsx(classes.leftBorder, index === 0 && 'active')} >
+                <ListItemIcon className={classes.colorWhite}>{tab.icon}</ListItemIcon>
+                <ListItemText primary={tab.name} />
+              </ListItem>
+            </NavLink>
           )
         }
       </List>
