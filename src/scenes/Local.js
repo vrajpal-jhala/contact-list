@@ -159,7 +159,7 @@ class Local extends React.Component {
     this.setState({
       editable: false,
       isAdding: true,
-      selectedContact: { "id": contacts.length + 1 },
+      selectedContact: { "id": contacts[contacts.length - 1].id + 1 },
     });
   }
 
