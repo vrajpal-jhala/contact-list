@@ -8,6 +8,7 @@ import {
   Button,
   makeStyles,
   Hidden,
+  Typography,
 } from '@material-ui/core';
 import {
   Check,
@@ -37,9 +38,6 @@ const useStyle = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-  },
-  noMargin: {
-    margin: 0,
   },
 }));
 
@@ -93,23 +91,19 @@ const ContactListItem = ({ contact, selectContact, active, isNewContact, checkCo
               {name.split(" ").map((n) => n[0])}
             </Avatar>
           </Box>
-          <Box className={classes.contactName}>
-            <h3 className={classes.noMargin}>
-              {name}
-            </h3>
+          <Box className={classes.contactName} minWidth={0}>
+            <Typography noWrap variant="subtitle1"><b>{name}</b></Typography>
             <small>
               <Hidden mdUp>
-                {email}
+                <Typography noWrap>{email}</Typography>
               </Hidden>
             </small>
           </Box>
         </Box>
       </Grid>
       <Hidden smDown>
-        <Grid item md={6}>
-          <h4 className={classes.noMargin}>
-            {email}
-          </h4>
+        <Grid item md={6} zeroMinWidth>
+          <Typography noWrap variant="subtitle1"><b>{email}</b></Typography>
         </Grid>
       </Hidden>
     </Grid>

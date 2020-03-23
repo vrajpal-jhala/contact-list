@@ -1,119 +1,114 @@
-import React from 'react';
-import SceneHeader from '../components/SceneHeader';
-import ActionBar from '../components/ActionBar';
-import ContactList from '../components/ContactList';
-import ContactForm from '../components/ContactForm';
-import {
-  Grid,
-  withStyles,
-  Hidden,
-} from '@material-ui/core';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import React from "react";
+import SceneHeader from "../components/SceneHeader";
+import ActionBar from "../components/ActionBar";
+import ContactList from "../components/ContactList";
+import ContactForm from "../components/ContactForm";
+import { Grid, withStyles, Hidden } from "@material-ui/core";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const styles = theme => ({
   outerSpacing: {
-    padding: '50px 60px',
+    padding: "50px 60px",
     [theme.breakpoints.only("sm")]: {
-      padding: '30px 40px',
+      padding: "30px 40px"
     },
     [theme.breakpoints.only("xs")]: {
-      padding: '20px',
-    },
+      padding: "20px"
+    }
   },
   innerSpacing: {
-    padding: '0px 40px',
+    padding: "0px 40px",
     [theme.breakpoints.down("sm")]: {
-      padding: '0px',
-    },
+      padding: "0px"
+    }
   }
 });
 
 let contacts = [
   {
-    "id": "1",
-    "name": "Joey Tribbiani",
-    "about": "Actor",
-    "email": "joeyt@friends.com",
-    "phone": "+(069) 123-6547",
-    "company": "Actor Acadamy",
-    "address": "2738  Liberty Avenue, California"
+    id: "1",
+    name: "Joey Tribbiani",
+    about: "Actor",
+    email: "joeyt@friends.com",
+    phone: "+(069) 123-6547",
+    company: "Actor Acadamy",
+    address: "2738  Liberty Avenue, California"
   },
   {
-    "id": "2",
-    "name": "Rachel Green",
-    "about": "Fashion Designer",
-    "email": "greenrach@friends.com",
-    "phone": "718-896-1555",
-    "company": "Ralph Lauren",
-    "address": "377  Abia Martin Drive, Bethpage, New York"
+    id: "2",
+    name: "Rachel Green",
+    about: "Fashion Designer",
+    email: "greenrach@friends.com",
+    phone: "718-896-1555",
+    company: "Ralph Lauren",
+    address: "377  Abia Martin Drive, Bethpage, New York"
   },
   {
-    "id": "3",
-    "name": "Ross Geller",
-    "about": "Paleontologist",
-    "email": "rossaurus@friends.com",
-    "phone": "",
-    "company": "Dianosaur Museum",
-    "address": "4437  Plainfield Avenue, HOPKINTON, Massachusetts"
+    id: "3",
+    name: "Ross Geller",
+    about: "Paleontologist",
+    email: "rossaurus@friends.com",
+    phone: "",
+    company: "Dianosaur Museum",
+    address: "4437  Plainfield Avenue, HOPKINTON, Massachusetts"
   },
   {
-    "id": "4",
-    "name": "Phoebe Buffay",
-    "about": "Masseuse",
-    "email": "phebes@friends.com",
-    "phone": "802-232-8909",
-    "company": "",
-    "address": ""
+    id: "4",
+    name: "Phoebe Buffay",
+    about: "Masseuse",
+    email: "phebes@friends.com",
+    phone: "802-232-8909",
+    company: "",
+    address: ""
   },
   {
-    "id": "5",
-    "name": "Monica Geller",
-    "about": "Chef",
-    "email": "mon@friends.com",
-    "phone": "",
-    "company": "",
-    "address": ""
+    id: "5",
+    name: "Monica Geller",
+    about: "Chef",
+    email: "mon@friends.com",
+    phone: "",
+    company: "",
+    address: ""
   },
   {
-    "id": "6",
-    "name": "Chandler Bing",
-    "about": "Copywriter",
-    "email": "mrbing@friends.com",
-    "phone": "",
-    "company": "",
-    "address": "4709  Roosevelt Road, Dodge City, Kansas"
+    id: "6",
+    name: "Chandler Bing",
+    about: "Copywriter",
+    email: "mrbing@friends.com",
+    phone: "",
+    company: "",
+    address: "4709  Roosevelt Road, Dodge City, Kansas"
   },
   {
-    "id": "7",
-    "name": "Gunther",
-    "about": "Cafe Owner",
-    "email": "gunther@friends.com",
-    "phone": "330-443-9039",
-    "company": "Central Perk",
-    "address": ""
+    id: "7",
+    name: "Gunther",
+    about: "Cafe Owner",
+    email: "gunther@friends.com",
+    phone: "330-443-9039",
+    company: "Central Perk",
+    address: ""
   },
   {
-    "id": "8",
-    "name": "Jill Green",
-    "about": "Rachel's sister",
-    "email": "jgreen@gmail.com",
-    "phone": "",
-    "company": "",
-    "address": "2035  Nixon Avenue, Kingsport, Tennessee"
+    id: "8",
+    name: "Jill Green",
+    about: "Rachel's sister",
+    email: "jgreen@gmail.com",
+    phone: "",
+    company: "",
+    address: "2035  Nixon Avenue, Kingsport, Tennessee"
   },
   {
-    "id": "9",
-    "name": "Jack Geller",
-    "about": "Ross' father",
-    "email": "jackg@gmail.com",
-    "phone": "908-617-5594",
-    "company": "",
-    "address": "3033  Patterson Road, SPANGLE, Washington"
-  },
+    id: "9",
+    name: "Jack Geller",
+    about: "Ross' father",
+    email: "jackg@gmail.com",
+    phone: "908-617-5594",
+    company: "",
+    address: "3033  Patterson Road, SPANGLE, Washington"
+  }
 ];
 
 class Local extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -122,130 +117,163 @@ class Local extends React.Component {
       selectedContact: {},
       editable: false,
       isAdding: false,
-      searchQuery: '',
-    }
+      searchQuery: ""
+    };
   }
 
-  setSelectedContact = (id) => {
+  setSelectedContact = id => {
     const { data, isAdding, selectedContact, editable } = this.state;
     const stillAdding = isAdding && id === selectedContact.id;
     this.setState({
-      selectedContact: stillAdding ? selectedContact : data.find(contact => contact.id === id),
+      selectedContact: stillAdding
+        ? selectedContact
+        : data.find(contact => contact.id === id),
       isAdding: stillAdding,
-      editable: editable && id === selectedContact.id,
+      editable: editable && id === selectedContact.id
     });
   };
 
   deselectContact = () => {
     this.setState({
       selectedContact: {},
-      editable: false,
+      editable: false
     });
-  }
+  };
 
-  setEditable = (id) => {
+  setEditable = id => {
     const { data, editable } = this.state;
     this.setState({
       editable: !editable,
       selectedContact: data.find(contact => contact.id === id),
-      isAdding: false,
+      isAdding: false
     });
   };
 
-  updateContact = (updatedContact) => {
+  updateContact = updatedContact => {
     var { selectedContact } = this.state;
-    var index = contacts.findIndex(contact => contact.id === selectedContact.id);
-    contacts[index] = Object.assign({}, contacts[index], updatedContact);
-    this.setState({
-      data: contacts,
-      editable: false,
-    });
+
+    var emailExist = contacts.some(
+      contact => {
+        console.log(contact.id !== updatedContact.id &&
+          contact.email === updatedContact.email);
+        return contact.id !== updatedContact.id &&
+        contact.email === updatedContact.email
+      }
+    );
+
+    if (emailExist) {
+      return false;
+    } else {
+      var index = contacts.findIndex(
+        contact => contact.id === selectedContact.id
+      );
+      contacts[index] = Object.assign({}, contacts[index], updatedContact);
+      this.setState({
+        data: contacts,
+        editable: false
+      });
+
+      return true;
+    }
   };
 
   addContact = () => {
     this.setState({
       editable: false,
       isAdding: true,
-      selectedContact: { "id": contacts[contacts.length - 1].id + 1 },
+      searchQuery: "",
+      selectedContact: { id: contacts[contacts.length - 1].id + 1 }
     });
-  }
+  };
 
   cancelAddContact = () => {
     this.setState({
       isAdding: false,
-      selectedContact: {},
+      selectedContact: {}
     });
-  }
+  };
 
-  saveContact = (newContact) => {
+  saveContact = ({ name, email }) => {
     const { selectedContact } = this.state;
-    contacts.push({
-      ...selectedContact,
-      ...newContact,
-    });
 
-    this.setState({
-      data: contacts,
-      isAdding: false,
-      searchQuery: '',
-    });
-  }
+    var emailExist = contacts.some(contact => contact.email === email);
 
-  checkContact = (id) => {
+    if (emailExist) {
+      return false;
+    } else {
+      contacts.push({
+        ...selectedContact,
+        name,
+        email
+      });
+
+      this.setState({
+        data: contacts,
+        isAdding: false,
+        searchQuery: ""
+      });
+
+      return false;
+    }
+  };
+
+  checkContact = id => {
     var { data } = this.state;
     const index = data.findIndex(contact => contact.id === id);
     data[index].checked = !data[index].checked;
 
     this.setState({
-      data: data,
+      data: data
     });
-  }
+  };
 
   selectAll = () => {
     var { data } = this.state;
 
-    data.forEach(contact => contact.checked = true);
+    data.forEach(contact => (contact.checked = true));
 
     this.setState({
-      data: data,
+      data: data
     });
-  }
+  };
 
   deselectAll = () => {
     var { data } = this.state;
 
-    data.forEach(contact => contact.checked = false);
+    data.forEach(contact => (contact.checked = false));
 
     this.setState({
-      data: data,
+      data: data
     });
-  }
+  };
 
   deleteContact = () => {
-    contacts = contacts.filter((contact) => !contact.checked);
+    contacts = contacts.filter(contact => !contact.checked);
 
     this.setState({
       data: contacts,
-      searchQuery: '',
+      searchQuery: "",
       editable: false,
       isAdding: false,
-      selectedContact: {},
+      selectedContact: {}
     });
-  }
+  };
 
   searchContact = ({ target }) => {
     var { value } = target;
 
-    const filteredData = contacts.filter((contact) => contact.name.toLowerCase().includes(value.toLowerCase()));
+    const filteredData = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(value.toLowerCase())
+    );
 
     this.setState({
       data: filteredData,
       searchQuery: value,
       editable: false,
       isAdding: false,
-      selectedContact: {},
+      selectedContact: {}
     });
-  }
+  };
 
   render = () => {
     const { classes } = this.props;
@@ -256,7 +284,7 @@ class Local extends React.Component {
     var someSelected = data.some(contact => contact.checked);
 
     return (
-      <Grid container className={classes.outerSpacing} >
+      <Grid container className={classes.outerSpacing}>
         <SceneHeader />
         <Grid container item md={12} className={classes.innerSpacing}>
           <ActionBar
@@ -285,7 +313,9 @@ class Local extends React.Component {
           />
           <Hidden mdDown>
             <ContactForm
-              selectedContact={data.find(contact => contact.id === selectedContact.id) || {}}
+              selectedContact={
+                data.find(contact => contact.id === selectedContact.id) || {}
+              }
               editable={editable}
               editContact={this.setEditable}
               updateContact={this.updateContact}
@@ -293,7 +323,7 @@ class Local extends React.Component {
             />
           </Hidden>
         </Grid>
-      </Grid >
+      </Grid>
     );
   };
 }
