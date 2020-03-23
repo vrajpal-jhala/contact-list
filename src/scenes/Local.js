@@ -153,12 +153,7 @@ class Local extends React.Component {
     var { selectedContact } = this.state;
 
     var emailExist = contacts.some(
-      contact => {
-        console.log(contact.id !== updatedContact.id &&
-          contact.email === updatedContact.email);
-        return contact.id !== updatedContact.id &&
-        contact.email === updatedContact.email
-      }
+      contact => contact.id !== updatedContact.id && contact.email === updatedContact.email
     );
 
     if (emailExist) {

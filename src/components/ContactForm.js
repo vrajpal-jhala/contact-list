@@ -46,7 +46,22 @@ const useStyle = makeStyles(theme => ({
   },
   avatar: {
     height: "80px",
-    width: "80px"
+    width: "80px",
+  },
+  overlayEdit: {
+    position: 'absolute',
+    zIndex: 1,
+    borderRadius: '50%',
+    cursor: "pointer",
+    height: 80,
+    width: 80,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    opacity: 0,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    '&:hover': {
+      opacity: 1,
+    },
   },
   fallbackText: {
     fontSize: 28
@@ -103,7 +118,9 @@ const ContactForm = ({
 }) => {
   const classes = useStyle();
 
-  const [emailError, setEmailError] = useState("");
+  const [emailError, setEmailError] = useState('');
+
+  const [selectedFile, setSelectedFile] = useState('');
 
   useEffect(() => {
     setEmailError("");
@@ -225,8 +242,8 @@ const ContactForm = ({
   };
 
   const onSubmit = data => {
-    var res = updateContact({...data, id: selectedContact.id});
-    if (!res) setEmailError("Email already exists");
+    var res = updateContact({ ...data, id: selectedContact.id, avatar: selectedFile });
+    if (!res) setEmailError("Email already exists"); else setSelectedFile('');
   };
 
   const handleAction = (func) => {
@@ -234,12 +251,18 @@ const ContactForm = ({
     setEmailError('');
   }
 
+  const handleUpload = ({ target }) => {
+    const { files } = target;
+    var blob = URL.createObjectURL(files[0]);
+    setSelectedFile(blob);
+  }
+
   const display = (field, input = false) => {
     return input
       ? selectedContact[field]
       : selectedContact[field] === "" || selectedContact[field] === undefined
-      ? "N/A"
-      : selectedContact[field];
+        ? "N/A"
+        : selectedContact[field];
   };
 
   return (
@@ -265,9 +288,33 @@ const ContactForm = ({
             </>
           )}
           <Box className={classes.formHeader}>
+            {
+              editable &&
+              <>
+                <input
+                  hidden
+                  accept="image/*"
+                  className={classes.input}
+                  id="contained-button-file"
+                  multiple
+                  type="file"
+                  onChange={handleUpload}
+                />
+                <label htmlFor="contained-button-file">
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    className={classes.overlayEdit}
+                  >
+                    <Edit />
+                  </Box>
+                </label>
+              </>
+            }
             <Avatar
               className={classes.avatar}
-              src={selectedContact.avatar}
+              src={selectedFile.length > 0 ? selectedFile : selectedContact.avatar}
               style={{
                 backgroundColor: stringToColour(
                   display("name") + display("email", true)
@@ -297,8 +344,8 @@ const ContactForm = ({
                     placeholder="John Doe"
                   />
                 ) : (
-                  display("name", false)
-                )}
+                    display("name", false)
+                  )}
                 <FormHelperText error>
                   {errors.name ? errors.name.message : " "}
                 </FormHelperText>
@@ -322,8 +369,8 @@ const ContactForm = ({
                       placeholder="Software Developer"
                     />
                   ) : (
-                    display("about", false)
-                  )}
+                      display("about", false)
+                    )}
                   <FormHelperText error>
                     {errors.about ? errors.about.message : " "}
                   </FormHelperText>
@@ -347,8 +394,8 @@ const ContactForm = ({
                     placeholder="john@gmail.com"
                   />
                 ) : (
-                  display("email", false)
-                )}
+                    display("email", false)
+                  )}
                 <FormHelperText error>
                   {errors.email || emailError
                     ? errors.email
@@ -375,8 +422,8 @@ const ContactForm = ({
                     placeholder="+(91) 1234567890"
                   />
                 ) : (
-                  display("phone", false)
-                )}
+                    display("phone", false)
+                  )}
                 <FormHelperText error>
                   {errors.phone ? errors.phone.message : " "}
                 </FormHelperText>
@@ -399,8 +446,8 @@ const ContactForm = ({
                     placeholder="The Company"
                   />
                 ) : (
-                  display("company", false)
-                )}
+                    display("company", false)
+                  )}
                 <FormHelperText error>
                   {errors.company ? errors.company.message : " "}
                 </FormHelperText>
@@ -423,8 +470,8 @@ const ContactForm = ({
                     placeholder="13/B, Unknown, Nowhere"
                   />
                 ) : (
-                  display("address", false)
-                )}
+                    display("address", false)
+                  )}
                 <FormHelperText error>
                   {errors.address ? errors.address.message : " "}
                 </FormHelperText>
