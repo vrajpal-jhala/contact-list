@@ -17,7 +17,7 @@ import {
   ChevronRight,
   PermIdentity as Local,
   GitHub,
-  Twitter,
+  LiveTv,
 } from '@material-ui/icons';
 
 const useStyles = makeStyles(theme => ({
@@ -74,7 +74,7 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
         {
           [
             { icon: <Local />, name: "Local", path: "/" },
-            { icon: <Twitter />, name: "Twitter", path: "/twitter" },
+            { icon: <LiveTv />, name: "Shows", path: "/shows" },
             { icon: <GitHub />, name: "GitHub", path: "/github" }
           ].map((tab, index) =>
             <NavLink exact to={tab.path} key={tab.name}>

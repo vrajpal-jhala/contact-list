@@ -50,7 +50,7 @@ const useStyle = makeStyles(theme => ({
   actionBtn: {
     background: 'linear-gradient(to right, #fa8569, #ff4b6e)',
     color: '#ffffffbf',
-    textTransform: 'none',
+    textTransform: 'capitalize',
     height: '100%',
     margin: '0px 2px',
     [theme.breakpoints.down("sm")]: {
@@ -66,7 +66,7 @@ const useStyle = makeStyles(theme => ({
   },
 }));
 
-const ActionBar = ({ addContact, someSelected, deleteContact, searchQuery, searchContact }) => {
+const ActionBar = ({ recordType, searchQuery, someSelected, addRecord, deleteRecord, searchRecord }) => {
   const classes = useStyle();
 
   return (
@@ -75,19 +75,19 @@ const ActionBar = ({ addContact, someSelected, deleteContact, searchQuery, searc
         <Paper elevation={0} className={classes.searchBar}>
           <InputBase
             className={classes.searchInput}
-            placeholder="Search contacts"
+            placeholder={`Search ${recordType}s`}
             value={searchQuery}
-            onChange={searchContact}
+            onChange={searchRecord}
             inputProps={{ maxLength: 40 }}
           />
           <Search />
         </Paper>
       </Grid>
       <Grid item lg={4} md={6} sm={4} xs={12} className={classes.btnWrapper}>
-        <Button variant="contained" className={classes.actionBtn} onClick={addContact}>
-          + <Hidden only="sm">Add<Hidden smDown> Contact</Hidden></Hidden>
+        <Button variant="contained" className={classes.actionBtn} onClick={addRecord}>
+          + <Hidden only="sm">Add<Hidden smDown> {recordType}</Hidden></Hidden>
         </Button>
-        <Button variant="contained" className={classes.actionBtn} onClick={deleteContact} disabled={!someSelected} >
+        <Button variant="contained" className={classes.actionBtn} onClick={deleteRecord} disabled={!someSelected} >
           <Delete style={{ fontSize: 16 }} /> <Hidden only="sm">Delete</Hidden>
         </Button>
       </Grid>

@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import AppDrawer from './components/AppDrawer';
 import AppHeader from './components/AppHeader';
 import Local from './scenes/Local';
-import Twitter from './scenes/Twitter';
+import Shows from './scenes/Shows';
 import GitHub from './scenes/GitHub';
 import {
   withStyles,
@@ -16,6 +16,7 @@ import {
   Hidden,
 } from '@material-ui/core';
 
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./style.scss";
 
 const styles = theme => ({
@@ -79,8 +80,8 @@ class ContactApp extends React.Component {
               <Route exact path={"/"} key={"Local"}>
                 <Local />
               </Route>
-              <Route exact path={"/twitter"} key={"Twitter"}>
-                <Twitter />
+              <Route exact path={"/shows"} key={"Shows"}>
+                <Shows />
               </Route>
               <Route exact path={"/github"} key={"GitHub"}>
                 <GitHub />

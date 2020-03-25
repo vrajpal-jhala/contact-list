@@ -13,8 +13,11 @@ const useStyle = makeStyles(theme => ({
   }
 }));
 
-const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll }) => {
+const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll, listSchema }) => {
+  
   const classes = useStyle();
+
+  const {col1, col2} = listSchema;
 
   return (
     <Grid container className={classes.contactListHeader}>
@@ -27,9 +30,9 @@ const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll }
             checked={allSelected || someSelected}
           />
         </Grid>
-        <Grid item md={5} xs={10} sm={9}>Name</Grid>
+        <Grid item md={5} xs={10} sm={9}>{col1.name}</Grid>
         <Hidden smDown>
-          <Grid item md={6}>Email</Grid>
+          <Grid item md={6}>{col2.name}</Grid>
         </Hidden>
       </Grid>
     </Grid>

@@ -1,10 +1,9 @@
 import React from "react";
 import SceneHeader from "../components/SceneHeader";
 import ActionBar from "../components/ActionBar";
-import ContactList from "../components/ContactList";
-import ContactForm from "../components/ContactForm";
-import { Grid, withStyles, Hidden } from "@material-ui/core";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import RecordList from "../components/RecordList";
+import RecordForm from "../components/RecordForm";
+import { Grid, Box, withStyles, Hidden } from "@material-ui/core";
 
 const styles = theme => ({
   outerSpacing: {
@@ -108,13 +107,69 @@ let contacts = [
   }
 ];
 
+const validationObj = (value, message) => {
+  return { value, message };
+}
+
+const requiredValidation = () => {
+  return validationObj(true, "This field is required");
+}
+
+const patternValidation = (fieldName, pattern) => {
+  return validationObj(pattern, `Enter valid ${fieldName}`);
+}
+
+const minLengthValidation = (limit) => {
+  return validationObj(limit, `Enter at least ${limit} characters`);
+}
+
+const maxLengthValidation = (limit) => {
+  return validationObj(limit, `Enter no more than ${limit} characters`);
+}
+
+const validations = {
+  name: {
+    required: requiredValidation(),
+    pattern: patternValidation("name", /[^\s]+/),
+    minLength: minLengthValidation(2),
+    maxLength: maxLengthValidation(40),
+  },
+  about: {
+    required: requiredValidation(),
+    pattern: patternValidation("about", /[^\s]+/),
+    minLength: minLengthValidation(10),
+    maxLength: maxLengthValidation(50),
+  },
+  email: {
+    required: requiredValidation(),
+    pattern: patternValidation("email", /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
+    maxLength: maxLengthValidation(60),
+  },
+  phone: {
+    required: requiredValidation(),
+    pattern: patternValidation("phone", /[+][(](\d{1,5})[)][\s](\d{6,10})$/),
+  },
+  company: {
+    required: requiredValidation(),
+    pattern: patternValidation("name", /[^\s]+/),
+    minLength: minLengthValidation(5),
+    maxLength: maxLengthValidation(20)
+  },
+  address: {
+    required: requiredValidation(),
+    pattern: patternValidation("address", /[^\s]+/),
+    minLength: minLengthValidation(10),
+    maxLength: maxLengthValidation(100),
+  },
+};
+
 class Local extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       data: contacts,
-      selectedContact: {},
+      selectedContact: undefined,
       editable: false,
       isAdding: false,
       searchQuery: ""
@@ -123,19 +178,19 @@ class Local extends React.Component {
 
   setSelectedContact = id => {
     const { data, isAdding, selectedContact, editable } = this.state;
-    const stillAdding = isAdding && id === selectedContact.id;
+    const stillAdding = isAdding && selectedContact && id === selectedContact.id;
     this.setState({
       selectedContact: stillAdding
         ? selectedContact
         : data.find(contact => contact.id === id),
       isAdding: stillAdding,
-      editable: editable && id === selectedContact.id
+      editable: editable && selectedContact && id === selectedContact.id
     });
   };
 
   deselectContact = () => {
     this.setState({
-      selectedContact: {},
+      selectedContact: undefined,
       editable: false
     });
   };
@@ -157,7 +212,7 @@ class Local extends React.Component {
     );
 
     if (emailExist) {
-      return false;
+      return { status: false, error: { field: 'email', message: 'Email already exists' } };
     } else {
       var index = contacts.findIndex(
         contact => contact.id === selectedContact.id
@@ -165,10 +220,11 @@ class Local extends React.Component {
       contacts[index] = Object.assign({}, contacts[index], updatedContact);
       this.setState({
         data: contacts,
-        editable: false
+        editable: false,
+        selectedContact: contacts[index],
       });
 
-      return true;
+      return { status: true, error: {} };
     }
   };
 
@@ -184,7 +240,7 @@ class Local extends React.Component {
   cancelAddContact = () => {
     this.setState({
       isAdding: false,
-      selectedContact: {}
+      selectedContact: undefined
     });
   };
 
@@ -194,7 +250,7 @@ class Local extends React.Component {
     var emailExist = contacts.some(contact => contact.email === email);
 
     if (emailExist) {
-      return false;
+      return { status: false, error: { field: 'email', message: 'Email already exists' } };
     } else {
       contacts.push({
         ...selectedContact,
@@ -205,10 +261,11 @@ class Local extends React.Component {
       this.setState({
         data: contacts,
         isAdding: false,
+        selectedContact: contacts[contacts.length - 1],
         searchQuery: ""
       });
 
-      return false;
+      return { status: true, error: {} };
     }
   };
 
@@ -222,24 +279,22 @@ class Local extends React.Component {
     });
   };
 
-  selectAll = () => {
-    var { data } = this.state;
+  setChecked = (value) => {
+    var { shows } = this.state;
 
-    data.forEach(contact => (contact.checked = true));
+    shows.forEach(show => (show.checked = value));
 
     this.setState({
-      data: data
+      shows,
     });
+  }
+
+  selectAll = () => {
+    this.setChecked(true);
   };
 
   deselectAll = () => {
-    var { data } = this.state;
-
-    data.forEach(contact => (contact.checked = false));
-
-    this.setState({
-      data: data
-    });
+    this.setChecked(false);
   };
 
   deleteContact = () => {
@@ -250,7 +305,7 @@ class Local extends React.Component {
       searchQuery: "",
       editable: false,
       isAdding: false,
-      selectedContact: {}
+      selectedContact: undefined,
     });
   };
 
@@ -266,55 +321,122 @@ class Local extends React.Component {
       searchQuery: value,
       editable: false,
       isAdding: false,
-      selectedContact: {}
+      selectedContact: undefined,
     });
   };
 
   render = () => {
     const { classes } = this.props;
 
-    let { data, selectedContact, editable, isAdding, searchQuery } = this.state;
+    const { data, selectedContact, editable, isAdding, searchQuery } = this.state;
 
-    var allSelected = data.length && data.every(contact => contact.checked);
-    var someSelected = data.some(contact => contact.checked);
+    const allSelected = data.length && data.every(contact => contact.checked);
+    const someSelected = data.some(contact => contact.checked);
+
+    const listSchema = {
+      col1: { name: 'Name', key: 'name' },
+      col2: { name: 'Email', key: 'email' },
+    };
+
+    const formSchema = {
+      header: {
+        heading: 'name',
+        subHeading: 'about',
+      },
+      fields: [
+        {
+          label: 'Full Name',
+          name: 'name',
+          placeholder: 'John Doe',
+          validations: validations.name,
+        },
+        {
+          label: 'Email',
+          name: 'email',
+          placeholder: 'john@gmail.com',
+          validations: validations.email,
+        },
+        {
+          label: 'Phone',
+          name: 'phone',
+          placeholder: '+(99) 1234567890',
+          validations: validations.phone,
+        },
+        {
+          label: 'Company',
+          name: 'company',
+          placeholder: 'The Company',
+          validations: validations.company,
+        },
+        {
+          label: 'Address',
+          name: 'address',
+          placeholder: '13/B, Unknown, Nowhere',
+          validations: validations.address,
+        },
+        {
+          label: 'About',
+          name: 'about',
+          placeholder: 'Who is this?',
+          validations: validations.about,
+          onEdit: true,
+        }
+      ],
+    };
+
+    const miniFormSchema = {
+      field1: formSchema.fields[0],
+      field2: formSchema.fields[1],
+    };
+
+    delete miniFormSchema.field2.validations.required;
 
     return (
       <Grid container className={classes.outerSpacing}>
-        <SceneHeader />
+        <SceneHeader
+          icon={
+            <Box className={`fas fa-address-book fa-flip-horizontal headerIcon`} />
+          }
+          heading="Contacts"
+          subHeading="Welcome to FirstCRM Contact page"
+        />
         <Grid container item md={12} className={classes.innerSpacing}>
           <ActionBar
-            addContact={this.addContact}
-            deleteContact={this.deleteContact}
+            recordType="contact"
             searchQuery={searchQuery}
-            searchContact={this.searchContact}
             someSelected={someSelected}
+            addRecord={this.addContact}
+            deleteRecord={this.deleteContact}
+            searchRecord={this.searchContact}
           />
-          <ContactList
-            contacts={data}
-            selectedContact={selectedContact}
-            selectContact={this.setSelectedContact}
-            editContact={this.setEditable}
-            updateContact={this.updateContact}
+          <RecordList
+            records={data}
+            selectedRecord={selectedContact}
+            selectRecord={this.setSelectedContact}
+            editRecord={this.setEditable}
+            updateRecord={this.updateContact}
             isEditing={editable}
             isAdding={isAdding}
-            saveContact={this.saveContact}
-            checkContact={this.checkContact}
+            saveRecord={this.saveContact}
+            checkRecord={this.checkContact}
             selectAll={this.selectAll}
             deselectAll={this.deselectAll}
             allSelected={allSelected}
             someSelected={someSelected}
-            deselectContact={this.deselectContact}
-            cancelAddContact={this.cancelAddContact}
+            deselectRecord={this.deselectContact}
+            cancelAddRecord={this.cancelAddContact}
+            listSchema={listSchema}
+            addRecordFormSchema={miniFormSchema}
+            updateRecordFormSchema={formSchema}
           />
           <Hidden mdDown>
-            <ContactForm
-              selectedContact={
-                data.find(contact => contact.id === selectedContact.id) || {}
-              }
+            <RecordForm
+              record={selectedContact}
               editable={editable}
-              editContact={this.setEditable}
-              updateContact={this.updateContact}
-              deselectContact={this.deselectContact}
+              editRecord={this.setEditable}
+              updateRecord={this.updateContact}
+              goBack={this.deselectContact}
+              formSchema={formSchema}
             />
           </Hidden>
         </Grid>
