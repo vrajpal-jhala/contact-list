@@ -7,7 +7,9 @@ import {
   Button,
   makeStyles,
   Hidden,
-  TextField
+  InputLabel,
+  Input,
+  FormHelperText,
 } from "@material-ui/core";
 import { Check, Close } from "@material-ui/icons";
 
@@ -55,17 +57,22 @@ const InputField = ({ field, error, register, errors, autoFocus }) => {
   const { label, name, placeholder } = field;
   const resError = error.field === name,
     helperText = (errors[name] && errors[name].message) || (resError && error.message) || ' ';
+  const hasError = errors[name] !== undefined || resError;
   return (
-    <TextField
-      autoFocus={autoFocus}
-      label={label}
-      name={name}
-      placeholder={placeholder}
-      error={errors[name] !== undefined || resError}
-      inputRef={register(field.validations)}
-      onClick={event => event.stopPropagation()}
-      helperText={helperText}
-    />
+    <>
+      <InputLabel error={hasError}>{label}</InputLabel>
+      <Input
+        autoFocus={autoFocus}
+        name={name}
+        placeholder={placeholder}
+        error={hasError}
+        inputRef={register(field.validations)}
+        onClick={event => event.stopPropagation()}
+      />
+      <FormHelperText error={hasError}>
+        {helperText}
+      </FormHelperText>
+    </>
   )
 };
 

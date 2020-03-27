@@ -16,7 +16,6 @@ import {
   ChevronLeft,
   ChevronRight,
   PermIdentity as Local,
-  GitHub,
   LiveTv,
 } from '@material-ui/icons';
 
@@ -73,9 +72,9 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
       <List className={classes.menu}>
         {
           [
-            { icon: <Local />, name: "Local", path: "/" },
+            { icon: <Local />, name: "Contacts", path: "/" },
             { icon: <LiveTv />, name: "Shows", path: "/shows" },
-            { icon: <GitHub />, name: "GitHub", path: "/github" }
+            { icon: <span className='icon-pokedex' />, name: "Pokedex", path: "/pokedex" }
           ].map((tab, index) =>
             <NavLink exact to={tab.path} key={tab.name}>
               <ListItem button key={tab.name} className="menuItem" >

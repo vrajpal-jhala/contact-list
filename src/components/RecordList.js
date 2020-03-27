@@ -5,7 +5,7 @@ import {
   Grid,
 } from '@material-ui/core';
 
-const RecordList = ({ records, selectedRecord, selectRecord, editRecord, isEditing, updateRecord, saveRecord, isAdding, checkRecord, someSelected, allSelected, selectAll, deselectAll, deselectRecord, cancelAddRecord, listSchema, addRecordFormSchema, updateRecordFormSchema }) => {
+const RecordList = ({ totalPages, currPage, changePage, records, selectedRecord, selectRecord, editRecord, isEditing, updateRecord, saveRecord, isAdding, checkRecord, someSelected, allSelected, selectAll, deselectAll, deselectRecord, cancelAddRecord, listSchema, addRecordFormSchema, updateRecordFormSchema }) => {
 
   return (
     <Grid item lg={6} xs={12}>
@@ -17,6 +17,9 @@ const RecordList = ({ records, selectedRecord, selectRecord, editRecord, isEditi
         listSchema={listSchema}
       />
       <RecordListBody
+        totalPages={totalPages}
+        currPage={currPage}
+        changePage={changePage}
         records={records}
         selectedRecord={selectedRecord}
         selectRecord={selectRecord}

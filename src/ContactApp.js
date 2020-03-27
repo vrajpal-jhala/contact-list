@@ -7,9 +7,9 @@ import {
 import clsx from 'clsx';
 import AppDrawer from './components/AppDrawer';
 import AppHeader from './components/AppHeader';
-import Local from './scenes/Local';
+import Contacts from './scenes/Contacts';
 import Shows from './scenes/Shows';
-import GitHub from './scenes/GitHub';
+import Pokedex from './scenes/Pokedex';
 import {
   withStyles,
   Backdrop,
@@ -77,14 +77,14 @@ class ContactApp extends React.Component {
               handleFullDrawerToggle={this.handleFullDrawerToggle}
             />
             <Switch>
-              <Route exact path={"/"} key={"Local"}>
-                <Local />
+              <Route exact path={"/"} key={"Contacts"}>
+                <Contacts />
               </Route>
               <Route exact path={"/shows"} key={"Shows"}>
                 <Shows />
               </Route>
-              <Route exact path={"/github"} key={"GitHub"}>
-                <GitHub />
+              <Route exact path={"/pokedex"} key={"Pokedex"}>
+                <Pokedex />
               </Route>
             </Switch>
           </div>

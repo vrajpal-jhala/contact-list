@@ -144,6 +144,7 @@ const FormRow = ({ input, validate, hidden }) => {
             <Input
               fullWidth
               name={name}
+              inputProps={field.inputProps}
               placeholder={placeholder}
               error={errors[name] !== undefined || resError}
               inputRef={register(validations)}
@@ -177,7 +178,7 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
     return colour + "bf";
   };
 
-  const { register, handleSubmit, errors } = useForm();
+  var { register, handleSubmit, errors, reset } = useForm();
 
   const [error, setError] = useState({});
 
@@ -188,9 +189,10 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
   const { header: { heading, subHeading }, fields } = formSchema;
 
   useEffect(() => {
+    reset();
     setError({});
     setSelectedFile(avatar);
-  }, [avatar]);
+  }, [avatar, reset]);
 
   const onSubmit = data => {
     var { status, error } = updateRecord({ ...data, id, avatar: selectedFile });

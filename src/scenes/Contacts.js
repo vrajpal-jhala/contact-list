@@ -3,7 +3,7 @@ import SceneHeader from "../components/SceneHeader";
 import ActionBar from "../components/ActionBar";
 import RecordList from "../components/RecordList";
 import RecordForm from "../components/RecordForm";
-import { Grid, Box, withStyles, Hidden } from "@material-ui/core";
+import { Grid, withStyles, Hidden } from "@material-ui/core";
 
 const styles = theme => ({
   outerSpacing: {
@@ -280,12 +280,12 @@ class Local extends React.Component {
   };
 
   setChecked = (value) => {
-    var { shows } = this.state;
+    var { data } = this.state;
 
-    shows.forEach(show => (show.checked = value));
+    data.forEach(contact => (contact.checked = value));
 
     this.setState({
-      shows,
+      data,
     });
   }
 
@@ -348,12 +348,18 @@ class Local extends React.Component {
           label: 'Full Name',
           name: 'name',
           placeholder: 'John Doe',
+          inputProps: {
+            maxLength: 40,
+          },
           validations: validations.name,
         },
         {
           label: 'Email',
           name: 'email',
           placeholder: 'john@gmail.com',
+          inputProps: {
+            maxLength: 50,
+          },
           validations: validations.email,
         },
         {
@@ -366,18 +372,27 @@ class Local extends React.Component {
           label: 'Company',
           name: 'company',
           placeholder: 'The Company',
+          inputProps: {
+            maxLength: 60,
+          },
           validations: validations.company,
         },
         {
           label: 'Address',
           name: 'address',
           placeholder: '13/B, Unknown, Nowhere',
+          inputProps: {
+            maxLength: 20,
+          },
           validations: validations.address,
         },
         {
           label: 'About',
           name: 'about',
           placeholder: 'Who is this?',
+          inputProps: {
+            maxLength: 100,
+          },
           validations: validations.about,
           onEdit: true,
         }
@@ -394,9 +409,7 @@ class Local extends React.Component {
     return (
       <Grid container className={classes.outerSpacing}>
         <SceneHeader
-          icon={
-            <Box className={`fas fa-address-book fa-flip-horizontal headerIcon`} />
-          }
+          icon="fas fa-address-book fa-flip-horizontal"
           heading="Contacts"
           subHeading="Welcome to FirstCRM Contact page"
         />

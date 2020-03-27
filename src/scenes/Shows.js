@@ -5,7 +5,6 @@ import ActionBar from "../components/ActionBar";
 import RecordList from "../components/RecordList";
 import RecordForm from "../components/RecordForm";
 import { Grid, withStyles, Hidden } from "@material-ui/core";
-import { LiveTv } from "@material-ui/icons";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const styles = theme => ({
@@ -90,15 +89,22 @@ class Shows extends React.Component {
       editable: false,
       isAdding: false,
       searchQuery: "",
+      totalPages: 0,
+      currPage: 0,
     };
   }
 
-  apiCall = (url, search) => {
+  apiCall = (url, currPage, search) => {
+    const perPage = 10;
+    const start = currPage * perPage;
+    const end = start + perPage;
     axios({
       method: 'GET',
       url,
       responseType: 'JSON'
     }).then(({ data }) => {
+      const totalRecords = data.length;
+      const totalPages = Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
       var modifiedData = data.map((show) => {
         show = search ? show.show : show;
         const {
@@ -113,13 +119,13 @@ class Shows extends React.Component {
         const { medium: avatar = '' } = image;
         const net = show.network || {};
         const { name: network = '' } = net;
-        return { id, avatar, name, language, network, genre: genres[0], summary };
-      });
-
-      modifiedData = modifiedData.slice(0, 10);
+        return { id, avatar, name, language, network, genre: genres.join('/'), summary };
+      }).slice(start, end);
 
       this.setState({
         shows: modifiedData,
+        totalPages,
+        currPage
       });
     }).catch((error) => {
       console.log(error);
@@ -127,7 +133,11 @@ class Shows extends React.Component {
   }
 
   componentDidMount = () => {
-    this.apiCall('http://api.tvmaze.com/shows?page=0');
+    this.apiCall('http://api.tvmaze.com/shows?page=0', 0);
+  }
+
+  setPageNo = (event, pageNo) => {
+    this.apiCall('http://api.tvmaze.com/shows?page=0', pageNo - 1);
   }
 
   setSelectedShow = (id) => {
@@ -160,7 +170,7 @@ class Shows extends React.Component {
 
   updateShow = (updatedShow) => {
     var { shows, selectedShow } = this.state;
-   
+
     var index = shows.findIndex(
       show => show.id === selectedShow.id
     );
@@ -246,24 +256,24 @@ class Shows extends React.Component {
       shows: shows,
       editable: false,
       isAdding: false,
-      selectedContact: undefined,
+      selectedShow: undefined,
       searchQuery: "",
     });
   }
 
-  searchShow = ({target}) => {
+  searchShow = ({ target }) => {
     var { value } = target;
 
-    if(value !== '')
-      this.apiCall(`http://api.tvmaze.com/search/shows?q=${value}`, true);
+    if (value !== '')
+      this.apiCall(`http://api.tvmaze.com/search/shows?q=${value}`, 0, true);
     else
-      this.apiCall('http://api.tvmaze.com/shows/page?0');
+      this.apiCall('http://api.tvmaze.com/shows/page?0', 0);
 
     this.setState({
       searchQuery: value,
       editable: false,
       isAdding: false,
-      selectedContact: undefined,
+      selectedShow: undefined,
     });
   }
 
@@ -271,7 +281,7 @@ class Shows extends React.Component {
   render = () => {
     const { classes } = this.props;
 
-    const { shows, selectedShow, editable, isAdding, searchQuery } = this.state;
+    const { shows, selectedShow, editable, isAdding, searchQuery, totalPages, currPage } = this.state;
 
     const allSelected = shows.length && shows.every(show => show.checked);;
     const someSelected = shows.some(show => show.checked);
@@ -291,18 +301,27 @@ class Shows extends React.Component {
           label: 'Name',
           name: 'name',
           placeholder: 'Game of Thrones',
+          inputProps: {
+            maxLength: 40,
+          },
           validations: validations.name,
         },
         {
           label: 'Language',
           name: 'language',
           placeholder: 'English',
+          inputProps: {
+            maxLength: 10,
+          },
           validations: validations.language,
         },
         {
           label: 'Genre',
           name: 'genre',
           placeholder: 'Comedy',
+          inputProps: {
+            maxLength: 15,
+          },
           validations: validations.genre,
           onEdit: true,
         },
@@ -310,12 +329,18 @@ class Shows extends React.Component {
           label: 'Network',
           name: 'network',
           placeholder: 'Disney',
+          inputProps: {
+            maxLength: 15,
+          },
           validations: validations.nework,
         },
         {
           label: 'Summary',
           name: 'summary',
           placeholder: 'What it\'s all about',
+          inputProps: {
+            maxLength: 500,
+          },
           validations: validations.summary,
         },
       ],
@@ -329,9 +354,7 @@ class Shows extends React.Component {
     return (
       <Grid container className={classes.outerSpacing}>
         <SceneHeader
-          icon={
-            <LiveTv className="headerIcon" />
-          }
+          icon="fas fa-tv"
           heading="TV Shows"
           subHeading="Welcome to TVMaze page"
         />
@@ -345,6 +368,9 @@ class Shows extends React.Component {
             searchRecord={this.searchShow}
           />
           <RecordList
+            totalPages={totalPages}
+            currPage={currPage}
+            changePage={this.setPageNo}
             records={shows}
             selectedRecord={selectedShow}
             selectRecord={this.setSelectedShow}

@@ -3,6 +3,9 @@ import {
   Hidden,
   makeStyles,
 } from '@material-ui/core';
+import {
+  Pagination
+} from '@material-ui/lab';
 import RecordListItem from './RecordListItem';
 import NewRecordListItem from './NewRecordListItem';
 import RecordForm from './RecordForm';
@@ -13,10 +16,14 @@ const useStyle = makeStyles(theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     height: '40vh'
-  }
+  },
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
 }));
 
-const RecordListBody = ({ records, selectedRecord, selectRecord, editRecord, isEditing, updateRecord, isAdding, saveRecord, checkRecord, deselectRecord, cancelAddRecord, listSchema, addRecordFormSchema, updateRecordFormSchema }) => {
+function RecordListBody({ totalPages, currPage, changePage, records, selectedRecord, selectRecord, editRecord, isEditing, updateRecord, isAdding, saveRecord, checkRecord, deselectRecord, cancelAddRecord, listSchema, addRecordFormSchema, updateRecordFormSchema }) {
 
   const classes = useStyle();
 
@@ -67,8 +74,23 @@ const RecordListBody = ({ records, selectedRecord, selectRecord, editRecord, isE
           formSchema={addRecordFormSchema}
         />
       }
+
+      <Pagination
+        count={totalPages}
+        page={currPage + 1}
+        color="primary"
+        shape="rounded"
+        className={classes.pagination}
+        onChange={changePage}
+      />
     </>
   );
 };
+
+RecordListBody.defaultProps = {
+  totalPages: 0,
+  currPage: 0,
+  changePage: () => { },
+}
 
 export default RecordListBody;
