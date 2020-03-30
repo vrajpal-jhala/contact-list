@@ -1,4 +1,5 @@
 import React from "react";
+import prepareValidations from './Validations';
 import SceneHeader from "../components/SceneHeader";
 import ActionBar from "../components/ActionBar";
 import RecordList from "../components/RecordList";
@@ -107,73 +108,171 @@ let contacts = [
   }
 ];
 
-const validationObj = (value, message) => {
-  return { value, message };
-}
-
-const requiredValidation = () => {
-  return validationObj(true, "This field is required");
-}
-
-const patternValidation = (fieldName, pattern) => {
-  return validationObj(pattern, `Enter valid ${fieldName}`);
-}
-
-const minLengthValidation = (limit) => {
-  return validationObj(limit, `Enter at least ${limit} characters`);
-}
-
-const maxLengthValidation = (limit) => {
-  return validationObj(limit, `Enter no more than ${limit} characters`);
-}
-
-const validations = {
-  name: {
-    required: requiredValidation(),
-    pattern: patternValidation("name", /[^\s]+/),
-    minLength: minLengthValidation(2),
-    maxLength: maxLengthValidation(40),
-  },
-  about: {
-    required: requiredValidation(),
-    pattern: patternValidation("about", /[^\s]+/),
-    minLength: minLengthValidation(10),
-    maxLength: maxLengthValidation(50),
-  },
-  email: {
-    required: requiredValidation(),
-    pattern: patternValidation("email", /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
-    maxLength: maxLengthValidation(60),
-  },
-  phone: {
-    required: requiredValidation(),
-    pattern: patternValidation("phone", /[+][(](\d{1,5})[)][\s](\d{6,10})$/),
-  },
-  company: {
-    required: requiredValidation(),
-    pattern: patternValidation("name", /[^\s]+/),
-    minLength: minLengthValidation(5),
-    maxLength: maxLengthValidation(20)
-  },
-  address: {
-    required: requiredValidation(),
-    pattern: patternValidation("address", /[^\s]+/),
-    minLength: minLengthValidation(10),
-    maxLength: maxLengthValidation(100),
-  },
+const listSchema = {
+  col1: { name: 'Name', key: 'name' },
+  col2: { name: 'Email', key: 'email' },
 };
+
+let formSchema = {
+  header: {
+    heading: 'name',
+    subHeading: 'about',
+  },
+  fields: [
+    {
+      label: 'Full Name',
+      name: 'name',
+      placeholder: 'John Doe',
+      inputProps: {
+        maxLength: 40,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 2,
+        maxLength: 40,
+      },
+    },
+    {
+      label: 'Email',
+      name: 'email',
+      placeholder: 'john@gmail.com',
+      inputProps: {
+        maxLength: 60,
+      },
+      validations: {
+        required: true,
+        pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+        maxLength: 60,
+      },
+    },
+    {
+      label: 'Phone',
+      name: 'phone',
+      placeholder: '+(99) 1234567890',
+      inputProps: {
+        maxLength: 19,
+      },
+      validations: {
+        required: true,
+        pattern: /[+][(](\d{1,5})[)][\s](\d{6,10})$/,
+      },
+    },
+    {
+      label: 'Company',
+      name: 'company',
+      placeholder: 'The Company',
+      inputProps: {
+        maxLength: 20,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 5,
+        maxLength: 20,
+      },
+    },
+    {
+      label: 'Address',
+      name: 'address',
+      placeholder: '13/B, Unknown, Nowhere',
+      inputProps: {
+        maxLength: 100,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 10,
+        maxLength: 100,
+      },
+    },
+    {
+      label: 'About',
+      name: 'about',
+      placeholder: 'Who is this?',
+      inputProps: {
+        maxLength: 50,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 10,
+        maxLength: 50,
+      },
+      onEdit: true,
+    }
+  ],
+};
+
+const miniFormSchema = {
+  field1: formSchema.fields[0],
+  field2: formSchema.fields[1],
+};
+
+delete miniFormSchema.field2.validations.required;
 
 class Local extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      data: contacts,
+      data: [],
       selectedContact: undefined,
       editable: false,
       isAdding: false,
-      searchQuery: ""
+      searchQuery: "",
+      totalPages: 0,
+      currPage: 0,
     };
+  }
+
+  getPage = () => {
+    const { data, currPage } = this.state;
+    const perPage = 10;
+    const start = currPage * perPage;
+    const end = start + perPage;
+
+    return data.slice(start, end);
+  }
+
+  findTotalPages = (totalRecords) => {
+    const perPage = 10;
+    return Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
+  }
+
+  listAPICall = () => {
+    const totalPages = this.findTotalPages(contacts.length);
+
+    this.setState({
+      data: contacts,
+      totalPages,
+      currPage: 0,
+    });
+  }
+
+  searchAPICall = (value) => {
+    const filteredData = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(value.toLowerCase())
+    );
+
+    const totalPages = this.findTotalPages(filteredData.length);
+
+    this.setState({
+      data: filteredData,
+      totalPages,
+      currPage: 0,
+    })
+  }
+
+  componentDidMount = () => {
+    this.listAPICall();
+  }
+
+  setPageNo = (event, pageNo) => {
+    this.setState({
+      currPage: pageNo - 1,
+      selectedContact: undefined,
+    });
   }
 
   setSelectedContact = id => {
@@ -258,11 +357,15 @@ class Local extends React.Component {
         email
       });
 
+      const totalPages = this.findTotalPages(contacts.length);
+
       this.setState({
         data: contacts,
         isAdding: false,
         selectedContact: contacts[contacts.length - 1],
-        searchQuery: ""
+        searchQuery: "",
+        totalPages,
+        currPage: totalPages - 1,
       });
 
       return { status: true, error: {} };
@@ -298,7 +401,10 @@ class Local extends React.Component {
   };
 
   deleteContact = () => {
+    const { currPage } = this.state;
     contacts = contacts.filter(contact => !contact.checked);
+
+    const totalPages = this.findTotalPages(contacts.length);
 
     this.setState({
       data: contacts,
@@ -306,18 +412,15 @@ class Local extends React.Component {
       editable: false,
       isAdding: false,
       selectedContact: undefined,
+      totalPages,
+      currPage: currPage >= (totalPages - 1) ? currPage - 1 >= 0 ? currPage - 1 : 0 : currPage,
     });
   };
 
-  searchContact = ({ target }) => {
-    var { value } = target;
-
-    const filteredData = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(value.toLowerCase())
-    );
+  searchContact = (value) => {
+    this.searchAPICall(value);
 
     this.setState({
-      data: filteredData,
       searchQuery: value,
       editable: false,
       isAdding: false,
@@ -328,83 +431,14 @@ class Local extends React.Component {
   render = () => {
     const { classes } = this.props;
 
-    const { data, selectedContact, editable, isAdding, searchQuery } = this.state;
+    const { data, selectedContact, editable, isAdding, searchQuery, totalPages, currPage } = this.state;
 
     const allSelected = data.length && data.every(contact => contact.checked);
     const someSelected = data.some(contact => contact.checked);
 
-    const listSchema = {
-      col1: { name: 'Name', key: 'name' },
-      col2: { name: 'Email', key: 'email' },
-    };
+    formSchema.fields = prepareValidations(formSchema.fields);
 
-    const formSchema = {
-      header: {
-        heading: 'name',
-        subHeading: 'about',
-      },
-      fields: [
-        {
-          label: 'Full Name',
-          name: 'name',
-          placeholder: 'John Doe',
-          inputProps: {
-            maxLength: 40,
-          },
-          validations: validations.name,
-        },
-        {
-          label: 'Email',
-          name: 'email',
-          placeholder: 'john@gmail.com',
-          inputProps: {
-            maxLength: 50,
-          },
-          validations: validations.email,
-        },
-        {
-          label: 'Phone',
-          name: 'phone',
-          placeholder: '+(99) 1234567890',
-          validations: validations.phone,
-        },
-        {
-          label: 'Company',
-          name: 'company',
-          placeholder: 'The Company',
-          inputProps: {
-            maxLength: 60,
-          },
-          validations: validations.company,
-        },
-        {
-          label: 'Address',
-          name: 'address',
-          placeholder: '13/B, Unknown, Nowhere',
-          inputProps: {
-            maxLength: 20,
-          },
-          validations: validations.address,
-        },
-        {
-          label: 'About',
-          name: 'about',
-          placeholder: 'Who is this?',
-          inputProps: {
-            maxLength: 100,
-          },
-          validations: validations.about,
-          onEdit: true,
-        }
-      ],
-    };
-
-    const miniFormSchema = {
-      field1: formSchema.fields[0],
-      field2: formSchema.fields[1],
-    };
-
-    delete miniFormSchema.field2.validations.required;
+    const pageData = this.getPage();
 
     return (
       <Grid container className={classes.outerSpacing}>
@@ -416,14 +450,18 @@ class Local extends React.Component {
         <Grid container item md={12} className={classes.innerSpacing}>
           <ActionBar
             recordType="contact"
-            searchQuery={searchQuery}
+            searchLimit={{ maxLength: 40 }}
+            searchValue={searchQuery}
             someSelected={someSelected}
             addRecord={this.addContact}
             deleteRecord={this.deleteContact}
             searchRecord={this.searchContact}
           />
           <RecordList
-            records={data}
+            totalPages={totalPages}
+            currPage={currPage}
+            changePage={this.setPageNo}
+            records={pageData}
             selectedRecord={selectedContact}
             selectRecord={this.setSelectedContact}
             editRecord={this.setEditable}

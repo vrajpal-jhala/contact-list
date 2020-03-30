@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   makeStyles,
   Grid,
@@ -6,6 +6,8 @@ import {
   InputBase,
   Button,
   Hidden,
+  FormHelperText,
+  Tooltip,
 } from '@material-ui/core';
 import {
   Search,
@@ -51,7 +53,7 @@ const useStyle = makeStyles(theme => ({
     background: 'linear-gradient(to right, #fa8569, #ff4b6e)',
     color: '#ffffffbf',
     textTransform: 'capitalize',
-    height: '100%',
+    height: '41px',
     margin: '0px 2px',
     [theme.breakpoints.down("sm")]: {
       margin: '0px 6px',
@@ -66,30 +68,83 @@ const useStyle = makeStyles(theme => ({
   },
 }));
 
-const ActionBar = ({ recordType, searchQuery, someSelected, addRecord, deleteRecord, searchRecord }) => {
+const ActionBar = ({ recordType, searchValue, searchLimit, someSelected, addRecord, deleteRecord, searchRecord }) => {
+
   const classes = useStyle();
+
+  let [searchQuery, setSearchQuery] = useState({ value: '' });
+
+  const [error, setError] = useState({});
+
+  useEffect(() => {
+    setSearchQuery({value: searchValue});
+  }, [searchValue]);
+
+  const handleChange = ({ value }) => {
+    var { timeoutId } = searchQuery;
+
+    if (timeoutId)
+      clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      searchRecord(value);
+    }, 1000);
+
+    setSearchQuery({ value, timeoutId });
+  }
+
+  const handleKeyDown = ({ target, key }) => {
+    const { maxLength, value } = target;
+    var { timeoutId } = error;
+
+    const excessiveInput = key.length === 1 && value.length === maxLength;
+    if (excessiveInput) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
+        setError({});
+      }, 2000);
+
+      setError({ timeoutId, message: `This field can't accept more than ${maxLength} characters` });
+    }
+  }
 
   return (
     <Grid container item md={12}>
       <Grid item lg={4} md={6} sm={8} xs={12} className={classes.searchBarSpacing}>
-        <Paper elevation={0} className={classes.searchBar}>
-          <InputBase
-            className={classes.searchInput}
-            placeholder={`Search ${recordType}s`}
-            value={searchQuery}
-            onChange={searchRecord}
-            inputProps={{ maxLength: 40 }}
-          />
-          <Search />
-        </Paper>
+        <Tooltip title={`Search ${recordType}`} placement="top">
+          <Paper elevation={0} className={classes.searchBar}>
+            <InputBase
+              className={classes.searchInput}
+              placeholder={`Search ${recordType}s`}
+              value={searchQuery.value}
+              onChange={({ target }) => handleChange(target)}
+              onKeyDown={handleKeyDown}
+              inputProps={searchLimit}
+            />
+            <Search />
+          </Paper>
+        </Tooltip>
+        {
+          error.message &&
+          <FormHelperText error>{error.message}</FormHelperText>
+        }
       </Grid>
       <Grid item lg={4} md={6} sm={4} xs={12} className={classes.btnWrapper}>
-        <Button variant="contained" className={classes.actionBtn} onClick={addRecord}>
-          + <Hidden only="sm">Add<Hidden smDown> {recordType}</Hidden></Hidden>
-        </Button>
-        <Button variant="contained" className={classes.actionBtn} onClick={deleteRecord} disabled={!someSelected} >
-          <Delete style={{ fontSize: 16 }} /> <Hidden only="sm">Delete</Hidden>
-        </Button>
+        <Tooltip title={`Add ${recordType}`} placement="top">
+          <Button variant="contained" className={classes.actionBtn} onClick={addRecord}>
+            + <Hidden only="sm">Add<Hidden smDown> {recordType}</Hidden></Hidden>
+          </Button>
+        </Tooltip>
+        <Tooltip title={`Delete ${recordType}`} placement="top">
+          <span>
+            <Button variant="contained" className={classes.actionBtn} onClick={deleteRecord} disabled={!someSelected} >
+              <Delete style={{ fontSize: 16 }} /> <Hidden only="sm">Delete</Hidden>
+            </Button>
+          </span>
+        </Tooltip>
       </Grid>
     </Grid>
   );

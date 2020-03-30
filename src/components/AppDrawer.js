@@ -11,6 +11,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Tooltip,
 } from '@material-ui/core';
 import {
   ChevronLeft,
@@ -64,24 +65,28 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
         })
       }}
     >
-      <div className={classes.toggleBtn}>
-        <IconButton color="inherit" onClick={handleMiniDrawerToggle}>
-          {open === "open" ? <ChevronLeft /> : <ChevronRight />}
-        </IconButton>
-      </div>
+      <Tooltip title={open === "close" ? "Close" : "Open"} placement="right">
+        <div className={classes.toggleBtn}>
+          <IconButton color="inherit" onClick={handleMiniDrawerToggle}>
+            {open === "open" ? <ChevronLeft /> : <ChevronRight />}
+          </IconButton>
+        </div>
+      </Tooltip>
       <List className={classes.menu}>
         {
           [
             { icon: <Local />, name: "Contacts", path: "/" },
             { icon: <LiveTv />, name: "Shows", path: "/shows" },
             { icon: <span className='icon-pokedex' />, name: "Pokedex", path: "/pokedex" }
-          ].map((tab, index) =>
-            <NavLink exact to={tab.path} key={tab.name}>
-              <ListItem button key={tab.name} className="menuItem" >
-                <ListItemIcon className={classes.colorWhite}>{tab.icon}</ListItemIcon>
-                <ListItemText primary={tab.name} />
-              </ListItem>
-            </NavLink>
+          ].map(({icon, name, path}) =>
+            <Tooltip title={name} placement="right" key={name}>
+              <NavLink exact to={path}>
+                <ListItem button className="menuItem" >
+                  <ListItemIcon className={classes.colorWhite}>{icon}</ListItemIcon>
+                  <ListItemText primary={name} />
+                </ListItem>
+              </NavLink>
+            </Tooltip>
           )
         }
       </List>

@@ -5,12 +5,14 @@ import {
   Grid,
   Box,
   Avatar,
+  Button,
   Input,
   Fab,
   FormHelperText,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
-import { Check, Edit, Close, ArrowBack } from "@material-ui/icons";
+import { Check, Edit, Close, ArrowBack, Delete } from "@material-ui/icons";
 
 const useStyle = makeStyles(theme => ({
   extendedIcon: {
@@ -43,6 +45,9 @@ const useStyle = makeStyles(theme => ({
     [theme.breakpoints.only("xs")]: {
       paddingBottom: 20
     }
+  },
+  avatarWrapper: {
+    position: "relative",
   },
   avatar: {
     height: "80px",
@@ -90,6 +95,22 @@ const useStyle = makeStyles(theme => ({
       right: 20
     }
   },
+  removeBtn: {
+    position: "absolute",
+    zIndex: 2,
+    bottom: 0,
+    right: 0,
+    background: "linear-gradient(to right, #fa8569, #ff4b6e)",
+    color: "#ffffffbf",
+    padding: 0,
+    margin: "0px 2px",
+    maxWidth: 30,
+    minWidth: 30,
+    maxHeight: 30,
+    minHeight: 30,
+    borderRadius: "50%",
+    boxShadow: "1px 1px 2px grey"
+  },
   cancelBtn: {
     background: "linear-gradient(to right, #ffffff, #e8ecef)",
     position: "absolute",
@@ -125,8 +146,8 @@ const display = (field, record, input = false) => {
 
 const FormRow = ({ input, validate, hidden }) => {
   const classes = useStyle();
-  const { field, editable, record } = input;
-  const { label, name, placeholder, validations } = field || {};
+  const { field, editable, record, handleKeyDown } = input;
+  const { label, name, placeholder, inputProps, validations } = field || {};
   const { error, errors, register } = validate;
   const resError = error.field === name,
     helperText = (errors[name] && errors[name].message) || (resError && error.message) || ' ';
@@ -141,15 +162,18 @@ const FormRow = ({ input, validate, hidden }) => {
         {
           (
             editable &&
-            <Input
-              fullWidth
-              name={name}
-              inputProps={field.inputProps}
-              placeholder={placeholder}
-              error={errors[name] !== undefined || resError}
-              inputRef={register(validations)}
-              defaultValue={display(name, record, editable)}
-            />
+            <Tooltip title={label}>
+              <Input
+                fullWidth
+                name={name}
+                inputProps={inputProps}
+                placeholder={placeholder}
+                error={errors[name] !== undefined || resError}
+                inputRef={register(validations)}
+                defaultValue={display(name, record, editable)}
+                onKeyDown={(event) => handleKeyDown(event)}
+              />
+            </Tooltip>
           ) || display(name, record, false)
         }
         <FormHelperText error>
@@ -192,12 +216,23 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
     reset();
     setError({});
     setSelectedFile(avatar);
-  }, [avatar, reset]);
+  }, [record, avatar, reset]);
 
-  const onSubmit = data => {
-    var { status, error } = updateRecord({ ...data, id, avatar: selectedFile });
-    if (!status) setError(error);
-  };
+  const handleKeyDown = ({ target, key }) => {
+    const { name, maxLength, value } = target;
+    const { field } = error;
+
+    if (field !== name) {
+      const excessiveInput = key.length === 1 && value.length === maxLength;
+      if (excessiveInput) {
+        setError({ field: name, message: `This field can't accept more than ${maxLength} characters` });
+
+        setTimeout(() => {
+          setError({});
+        }, 2000);
+      }
+    }
+  }
 
   const handleAction = (func) => {
     func(id);
@@ -210,6 +245,11 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
     setSelectedFile(blob);
   }
 
+  const onSubmit = data => {
+    var { status, error } = updateRecord({ ...data, id, avatar: selectedFile });
+    if (!status) setError(error);
+  };
+
   return (
     <Grid item lg={6} xs={12}>
       <Grid item container wrap="nowrap" md={12} className={classes.formWrapper}>
@@ -217,72 +257,91 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
           {
             record && (
               <>
-                <Fab
-                  size="small"
-                  className={classes.backBtn}
-                  onClick={() => handleAction(goBack)}
-                >
-                  <ArrowBack />
-                </Fab>
-                <Fab
-                  size="small"
-                  className={editable ? classes.cancelBtn : classes.editBtn}
-                  onClick={() => handleAction(editRecord)}
-                >
-                  {editable ? <Close /> : <Edit />}
-                </Fab>
+                <Tooltip title="Back">
+                  <Fab
+                    size="small"
+                    className={classes.backBtn}
+                    onClick={() => handleAction(goBack)}
+                  >
+                    <ArrowBack />
+                  </Fab>
+                </Tooltip>
+                <Tooltip title={editable ? "Cancel" : "Edit"}>
+                  <Fab
+                    size="small"
+                    className={editable ? classes.cancelBtn : classes.editBtn}
+                    onClick={() => handleAction(editRecord)}
+                  >
+                    {editable ? <Close /> : <Edit />}
+                  </Fab>
+                </Tooltip>
               </>
             )
           }
           <Box className={classes.formHeader}>
-            {
-              editable &&
-              <>
-                <input
-                  hidden
-                  accept="image/*"
-                  className={classes.input}
-                  id="contained-button-file"
-                  multiple
-                  type="file"
-                  onChange={handleUpload}
-                />
-                <label htmlFor="contained-button-file">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    className={classes.overlayEdit}
-                  >
-                    <Edit />
-                  </Box>
-                </label>
-              </>
-            }
-            <Avatar
-              className={classes.avatar}
-              src={selectedFile || display("avatar", record)}
-              style={{
-                backgroundColor: stringToColour(
-                  display(fields[0].name, record) + display(fields[1].name, record, true)
-                )
-              }}
-            >
+            <Box className={classes.avatarWrapper}>
               {
-                display(fields[0].name, record).split(" ").map(n => n[0])
+                editable &&
+                <>
+                  <input
+                    hidden
+                    accept="image/*"
+                    className={classes.input}
+                    id="contained-button-file"
+                    multiple
+                    type="file"
+                    onChange={handleUpload}
+                  />
+                  {
+                    (avatar || selectedFile) &&
+                    <Tooltip title="Remove">
+                      <Button
+                        className={classes.removeBtn}
+                        onClick={() => setSelectedFile(undefined)}
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  }
+                  <label htmlFor="contained-button-file">
+                    <Tooltip title="Change">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        className={classes.overlayEdit}
+                      >
+                        <Edit />
+                      </Box>
+                    </Tooltip>
+                  </label>
+                </>
               }
-            </Avatar>
+              <Avatar
+                className={classes.avatar}
+                src={selectedFile || display("avatar", record)}
+                style={{
+                  backgroundColor: stringToColour(
+                    display(fields[0].name, record) + display(fields[1].name, record, true)
+                  )
+                }}
+              >
+                {
+                  display(fields[0].name, record).split(" ").map(n => n[0])
+                }
+              </Avatar>
+            </Box>
             <Typography component="h2" variant="h5" className={classes.marginTop}><b>{display(heading, record)}</b></Typography>
             <small>{display(subHeading, record)}</small>
           </Box>
           <Grid container>
             {
-              fields.map(({onEdit, ...field}) => 
-                <FormRow 
-                  key={field.name} 
-                  input={{ field, record, editable }} 
+              fields.map(({ onEdit, ...field }) =>
+                <FormRow
+                  key={field.name}
+                  input={{ field, record, editable, handleKeyDown }}
                   validate={{ error, errors, register }}
-                  hidden={onEdit && !editable} 
+                  hidden={onEdit && !editable}
                 />
               )
             }
@@ -291,14 +350,16 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
               editable &&
               (
                 <Grid item container justify="center">
-                  <Fab
-                    variant="extended"
-                    className={classes.saveBtn}
-                    onClick={handleSubmit(onSubmit)}
-                  >
-                    <Check className={classes.extendedIcon} />
+                  <Tooltip title="Save">
+                    <Fab
+                      variant="extended"
+                      className={classes.saveBtn}
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      <Check className={classes.extendedIcon} />
                   Save
                   </Fab>
+                  </Tooltip>
                 </Grid>
               )
             }

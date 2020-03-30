@@ -7,9 +7,9 @@ import {
 import clsx from 'clsx';
 import AppDrawer from './components/AppDrawer';
 import AppHeader from './components/AppHeader';
-import Contacts from './scenes/Contacts';
-import Shows from './scenes/Shows';
-import Pokedex from './scenes/Pokedex';
+import Contacts from './screens/Contacts';
+import Shows from './screens/Shows';
+import Pokedex from './screens/Pokedex';
 import {
   withStyles,
   Backdrop,

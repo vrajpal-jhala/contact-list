@@ -8,6 +8,7 @@ import {
   makeStyles,
   Hidden,
   Typography,
+  Tooltip,
 } from '@material-ui/core';
 
 const useStyle = makeStyles(theme => ({
@@ -65,11 +66,13 @@ const RecordListItem = ({ record, isSelected, selectRecord, checkRecord, listSch
       onClick={() => selectRecord(id)}
     >
       <Grid item md={1} xs={2} sm={2}>
-        <Checkbox
-          onClick={(event) => { checkRecord(id); event.stopPropagation(); }}
-          color="primary"
-          checked={checked || false}
-        />
+        <Tooltip title="Selecte Item">
+          <Checkbox
+            onClick={(event) => { checkRecord(id); event.stopPropagation(); }}
+            color="primary"
+            checked={checked || false}
+          />
+        </Tooltip>
       </Grid>
       <Grid item md={5} xs={10} sm={9}>
         <Box className={classes.infoCol}>

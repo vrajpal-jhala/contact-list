@@ -30,7 +30,7 @@ function RecordListBody({ totalPages, currPage, changePage, records, selectedRec
   return (
     <>
       {
-        records.length === 0 &&
+        records.length === 0 && !isAdding &&
         <h3 className={classes.noContacts}>
           No Records
         </h3>

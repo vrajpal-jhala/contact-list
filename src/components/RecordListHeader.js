@@ -4,6 +4,7 @@ import {
   Grid,
   Checkbox,
   Hidden,
+  Tooltip,
 } from '@material-ui/core';
 
 const useStyle = makeStyles(theme => ({
@@ -14,21 +15,23 @@ const useStyle = makeStyles(theme => ({
 }));
 
 const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll, listSchema }) => {
-  
+
   const classes = useStyle();
 
-  const {col1, col2} = listSchema;
+  const { col1, col2 } = listSchema;
 
   return (
     <Grid container className={classes.contactListHeader}>
       <Grid item container xs={12} style={{ alignItems: 'center' }}>
         <Grid item md={1} xs={2} sm={2}>
-          <Checkbox
-            onClick={() => allSelected || someSelected ? deselectAll() : selectAll()}
-            color="primary"
-            indeterminate={someSelected && !allSelected}
-            checked={allSelected || someSelected}
-          />
+          <Tooltip title="Select/Deselect All" placement="top">
+            <Checkbox
+              onClick={() => allSelected || someSelected ? deselectAll() : selectAll()}
+              color="primary"
+              indeterminate={someSelected && !allSelected}
+              checked={allSelected || someSelected}
+            />
+          </Tooltip>
         </Grid>
         <Grid item md={5} xs={10} sm={9}>{col1.name}</Grid>
         <Hidden smDown>

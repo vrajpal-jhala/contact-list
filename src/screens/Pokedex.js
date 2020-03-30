@@ -1,11 +1,11 @@
 import React from "react";
+import prepareValidations from './Validations';
 import { InMemoryCache, ApolloClient, gql, HttpLink } from 'apollo-boost';
 import SceneHeader from "../components/SceneHeader";
 import ActionBar from "../components/ActionBar";
 import RecordList from "../components/RecordList";
 import RecordForm from "../components/RecordForm";
 import { Grid, withStyles, Hidden } from "@material-ui/core";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const styles = theme => ({
   outerSpacing: {
@@ -25,58 +25,103 @@ const styles = theme => ({
   }
 });
 
-const validationObj = (value, message) => {
-  return { value, message };
-}
+const listSchema = {
+  col1: { name: 'Name', key: 'name' },
+  col2: { name: 'Class', key: 'class' },
+};
 
-const requiredValidation = () => {
-  return validationObj(true, "This field is required");
-}
+let formSchema = {
+  header: {
+    heading: 'name',
+    subHeading: 'types',
+  },
+  fields: [
+    {
+      label: 'Name',
+      name: 'name',
+      placeholder: 'Pikachu',
+      inputProps: {
+        maxLength: 40,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 2,
+        maxLength: 40,
+      },
+    },
+    {
+      label: 'Class',
+      name: 'class',
+      placeholder: 'Seed',
+      inputProps: {
+        maxLength: 20,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 4,
+        maxLength: 20,
+      },
+    },
+    {
+      label: 'Types',
+      name: 'types',
+      placeholder: 'Water',
+      inputProps: {
+        maxLength: 30,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+        minLength: 4,
+        maxLength: 30,
+      },
+      onEdit: true,
+    },
+    {
+      label: 'Max CP',
+      name: 'maxCP',
+      placeholder: '12',
+      inputProps: {
+        maxLength: 4,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+      },
+    },
+    {
+      label: 'Max HP',
+      name: 'maxHP',
+      placeholder: '1234',
+      inputProps: {
+        maxLength: 4,
+      },
+      validations: {
+        required: true,
+        pattern: /[^\s]+/,
+      },
+    },
+    {
+      label: 'Evolutions',
+      name: 'evolutions',
+      placeholder: 'Pichu > Pikachu > Raichu',
+      inputProps: {
+        maxLength: 40,
+      },
+      validations: {
+        pattern: /[^\s]+/,
+        minLength: 4,
+        maxLength: 40,
+      },
+    },
+  ],
+};
 
-const patternValidation = (fieldName, pattern) => {
-  return validationObj(pattern, `Enter valid ${fieldName}`);
-}
-
-const minLengthValidation = (limit) => {
-  return validationObj(limit, `Enter at least ${limit} characters`);
-}
-
-const maxLengthValidation = (limit) => {
-  return validationObj(limit, `Enter no more than ${limit} characters`);
-}
-
-const validations = {
-  name: {
-    required: requiredValidation(),
-    pattern: patternValidation("name", /[^\s]+/),
-    minLength: minLengthValidation(2),
-    maxLength: maxLengthValidation(40),
-  },
-  class: {
-    required: requiredValidation(),
-    pattern: patternValidation("class", /[^\s]+/),
-    minLength: minLengthValidation(4),
-    maxLength: maxLengthValidation(20),
-  },
-  types: {
-    required: requiredValidation(),
-    pattern: patternValidation("types", /[^\s]+/),
-    minLength: minLengthValidation(4),
-    maxLength: maxLengthValidation(30),
-  },
-  maxCP: {
-    required: requiredValidation(),
-    pattern: patternValidation("max CP", /[^\s]+/),
-  },
-  maxHP: {
-    required: requiredValidation(),
-    pattern: patternValidation("max HP", /[^\s]+/),
-  },
-  evolutions: {
-    pattern: patternValidation("evolutions", /[^\s]+/),
-    minLength: minLengthValidation(4),
-    maxLength: maxLengthValidation(40),
-  },
+const miniFormSchema = {
+  field1: formSchema.fields[0],
+  field2: formSchema.fields[1],
 };
 
 class Pokedex extends React.Component {
@@ -141,6 +186,20 @@ class Pokedex extends React.Component {
       }`;
   }
 
+  getPage = () => {
+    const { pokedex, currPage } = this.state;
+    const perPage = 10;
+    const start = currPage * perPage;
+    const end = start + perPage;
+
+    return pokedex.slice(start, end);
+  }
+
+  findTotalPages = (totalRecords) => {
+    const perPage = 10;
+    return Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
+  }
+
   prepareObj = (pokemon) => {
     var {
       id,
@@ -159,42 +218,39 @@ class Pokedex extends React.Component {
     return { id, avatar, name, class: classification, types, maxCP, maxHP, evolutions };
   }
 
-  listAPICall = (currPage) => {
-    const perPage = 10;
-    const start = currPage * perPage;
-    const end = start + perPage;
+  listAPICall = () => {
     this.client.query({
       query: gql`${this.listQuery()}`,
     }).then(({ data }) => {
       var { pokemons } = data;
-      const totalRecords = pokemons.length;
-      const totalPages = Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
+      const totalPages = this.findTotalPages(pokemons.length);
+
       pokemons = pokemons.map((pokemon) =>
         this.prepareObj(pokemon)
-      ).slice(start, end);
+      );
 
       this.setState({
         pokedex: pokemons,
         totalPages,
-        currPage,
+        currPage: 0,
       });
     }).catch(error =>
       console.error(error)
     );
   }
 
-  searchAPICall = (query, currPage) => {
+  searchAPICall = (query) => {
     this.client.query({
       query: gql`${this.searchQuery(query)}`,
     }).then(({ data }) => {
       var { pokemon } = data;
-      const totalPages = 1;
       const pokemons = (pokemon && [this.prepareObj(pokemon)]) || [];
+      const totalPages = this.findTotalPages(pokemons.length);
 
       this.setState({
         pokedex: pokemons,
         totalPages,
-        currPage,
+        currPage: 0,
       });
     }).catch(error =>
       console.error(error)
@@ -202,11 +258,14 @@ class Pokedex extends React.Component {
   }
 
   componentDidMount = () => {
-    this.listAPICall(0);
+    this.listAPICall();
   }
 
   setPageNo = (event, pageNo) => {
-    this.listAPICall(pageNo - 1);
+    this.setState({
+      currPage: pageNo - 1,
+      selectedPokemon: undefined,
+    });
   }
 
   setSelectedPokemon = (id) => {
@@ -279,11 +338,15 @@ class Pokedex extends React.Component {
       ...newPokemon,
     });
 
+    const totalPages = this.findTotalPages(pokedex.length);
+
     this.setState({
       pokedex: pokedex,
       isAdding: false,
       selectedPokemon: pokedex[pokedex.length - 1],
       searchQuery: "",
+      totalPages,
+      currPage: totalPages - 1,
     });
 
     return { status: true, error: {} };
@@ -318,8 +381,10 @@ class Pokedex extends React.Component {
   }
 
   deletePokemon = () => {
-    var { pokedex } = this.state;
+    var { pokedex, currPage } = this.state;
     pokedex = pokedex.filter(pokemon => !pokemon.checked);
+
+    const totalPages = this.findTotalPages(pokedex.length);
 
     this.setState({
       pokedex: pokedex,
@@ -327,13 +392,13 @@ class Pokedex extends React.Component {
       isAdding: false,
       selectedPokemon: undefined,
       searchQuery: "",
+      totalPages,
+      currPage: currPage >= (totalPages - 1) ? currPage - 1 >= 0 ? currPage - 1 : 0 : currPage,
     });
   }
 
-  searchPokemon = ({ target }) => {
-    var { value } = target;
-
-    value === '' ? this.listAPICall(0) : this.searchAPICall(value, 0);
+  searchPokemon = (value) => {
+    value === '' ? this.listAPICall() : this.searchAPICall(value);
 
     this.setState({
       searchQuery: value,
@@ -343,7 +408,6 @@ class Pokedex extends React.Component {
     });
   }
 
-
   render = () => {
     const { classes } = this.props;
 
@@ -352,73 +416,9 @@ class Pokedex extends React.Component {
     const allSelected = pokedex.length && pokedex.every(pokemon => pokemon.checked);;
     const someSelected = pokedex.some(pokemon => pokemon.checked);
 
-    const listSchema = {
-      col1: { name: 'Name', key: 'name' },
-      col2: { name: 'Class', key: 'class' },
-    };
+    formSchema.fields = prepareValidations(formSchema.fields);
 
-    const formSchema = {
-      header: {
-        heading: 'name',
-        subHeading: 'types',
-      },
-      fields: [
-        {
-          label: 'Name',
-          name: 'name',
-          placeholder: 'Pikachu',
-          inputProps: {
-            maxLength: 40,
-          },
-          validations: validations.name,
-        },
-        {
-          label: 'Class',
-          name: 'class',
-          placeholder: 'Seed',
-          inputProps: {
-            maxLength: 20,
-          },
-          validations: validations.class,
-        },
-        {
-          label: 'Types',
-          name: 'types',
-          placeholder: 'Water',
-          inputProps: {
-            maxLength: 30,
-          },
-          validations: validations.types,
-          onEdit: true,
-        },
-        {
-          label: 'Max CP',
-          name: 'maxCP',
-          placeholder: '12',
-          validations: validations.maxCP,
-        },
-        {
-          label: 'Max HP',
-          name: 'maxHP',
-          placeholder: '1234',
-          validations: validations.maxHP,
-        },
-        {
-          label: 'Evolutions',
-          name: 'evolutions',
-          placeholder: 'Pichu > Pikachu > Raichu',
-          inputProps: {
-            maxLength: 40,
-          },
-          validations: validations.evolutions,
-        },
-      ],
-    };
-
-    const miniFormSchema = {
-      field1: formSchema.fields[0],
-      field2: formSchema.fields[1],
-    };
+    const pageData = this.getPage();
 
     return (
       <Grid container className={classes.outerSpacing}>
@@ -430,7 +430,8 @@ class Pokedex extends React.Component {
         <Grid container item md={12} className={classes.innerSpacing}>
           <ActionBar
             recordType="pokemon"
-            searchQuery={searchQuery}
+            searchLimit={{ maxLength: 20 }}
+            searchValue={searchQuery}
             someSelected={someSelected}
             addRecord={this.addPokemon}
             deleteRecord={this.deletePokemon}
@@ -440,7 +441,7 @@ class Pokedex extends React.Component {
             totalPages={totalPages}
             currPage={currPage}
             changePage={this.setPageNo}
-            records={pokedex}
+            records={pageData}
             selectedRecord={selectedPokemon}
             selectRecord={this.setSelectedPokemon}
             editRecord={this.setEditable}

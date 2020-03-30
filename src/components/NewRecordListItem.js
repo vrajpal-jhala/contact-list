@@ -10,6 +10,7 @@ import {
   InputLabel,
   Input,
   FormHelperText,
+  Tooltip,
 } from "@material-ui/core";
 import { Check, Close } from "@material-ui/icons";
 
@@ -53,22 +54,28 @@ const useStyle = makeStyles(theme => ({
   }
 }));
 
-const InputField = ({ field, error, register, errors, autoFocus }) => {
-  const { label, name, placeholder } = field;
+const InputField = ({ input, validate }) => {
+  const { field, handleKeyDown, autoFocus } = input;
+  const { label, name, placeholder, inputProps, validations } = field;
+  const { error, register, errors } = validate;
   const resError = error.field === name,
     helperText = (errors[name] && errors[name].message) || (resError && error.message) || ' ';
   const hasError = errors[name] !== undefined || resError;
   return (
     <>
       <InputLabel error={hasError}>{label}</InputLabel>
-      <Input
-        autoFocus={autoFocus}
-        name={name}
-        placeholder={placeholder}
-        error={hasError}
-        inputRef={register(field.validations)}
-        onClick={event => event.stopPropagation()}
-      />
+      <Tooltip title={label}>
+        <Input
+          autoFocus={autoFocus}
+          name={name}
+          inputProps={inputProps}
+          placeholder={placeholder}
+          error={hasError}
+          inputRef={register(validations)}
+          onKeyDown={(event) => handleKeyDown(event)}
+          onClick={event => event.stopPropagation()}
+        />
+      </Tooltip>
       <FormHelperText error={hasError}>
         {helperText}
       </FormHelperText>
@@ -86,6 +93,22 @@ const NewRecordListItem = ({ saveRecord, cancelAddRecord, formSchema }) => {
 
   const [error, setError] = useState({});
 
+  const handleKeyDown = ({ target, key }) => {
+    const { name, maxLength, value } = target;
+    const { field } = error;
+
+    if (field !== name) {
+      const excessiveInput = key.length === 1 && value.length === maxLength;
+      if (excessiveInput) {
+        setError({ field: name, message: `This field can't accept more than ${maxLength} characters` });
+
+        setTimeout(() => {
+          setError({});
+        }, 2000);
+      }
+    }
+  }
+
   const onSave = data => {
     const { status, error } = saveRecord(data);
     if (!status) setError(error);
@@ -100,27 +123,31 @@ const NewRecordListItem = ({ saveRecord, cancelAddRecord, formSchema }) => {
       >
         <Grid item xs={8} sm={5}>
           <Box className={classes.recordName}>
-            <InputField field={field1} errors={errors} error={error} register={register} autoFocus />
+            <InputField input={{ field: field1, handleKeyDown, autoFocus: true }} validate={{ errors, error, register }} />
             <Hidden smUp>
-              <InputField field={field2} errors={errors} error={error} register={register} />
+              <InputField input={{ field: field2, handleKeyDown }} validate={{ errors, error, register }} />
             </Hidden>
           </Box>
         </Grid>
         <Hidden only="xs">
           <Grid item sm={5}>
-            <InputField field={field2} errors={errors} error={error} register={register} />
+            <InputField input={{ field: field2, handleKeyDown }} validate={{ errors, error, register }} />
           </Grid>
         </Hidden>
         <Grid item xs={4} sm={2} container justify="flex-end">
-          <Button type="submit" className={classes.saveBtn}>
-            <Check />
-          </Button>
-          <Button
-            className={classes.closeBtn}
-            onClick={() => cancelAddRecord()}
-          >
-            <Close />
-          </Button>
+          <Tooltip title="Save">
+            <Button type="submit" className={classes.saveBtn}>
+              <Check />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Cancel">
+            <Button
+              className={classes.closeBtn}
+              onClick={() => cancelAddRecord()}
+            >
+              <Close />
+            </Button>
+          </Tooltip>
         </Grid>
       </Grid>
     </form>
