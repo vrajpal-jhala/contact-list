@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/contact-list/static/css/main.a2b577cf.chunk.css",
-    "main.js": "/contact-list/static/js/main.82d61ac1.chunk.js",
-    "main.js.map": "/contact-list/static/js/main.82d61ac1.chunk.js.map",
+    "main.css": "/contact-list/static/css/main.4c58e83f.chunk.css",
+    "main.js": "/contact-list/static/js/main.3844cf5f.chunk.js",
+    "main.js.map": "/contact-list/static/js/main.3844cf5f.chunk.js.map",
     "runtime-main.js": "/contact-list/static/js/runtime-main.8add0db0.js",
     "runtime-main.js.map": "/contact-list/static/js/runtime-main.8add0db0.js.map",
     "static/css/2.8bd3faab.chunk.css": "/contact-list/static/css/2.8bd3faab.chunk.css",
-    "static/js/2.6c9fa1ed.chunk.js": "/contact-list/static/js/2.6c9fa1ed.chunk.js",
-    "static/js/2.6c9fa1ed.chunk.js.map": "/contact-list/static/js/2.6c9fa1ed.chunk.js.map",
+    "static/js/2.fa698453.chunk.js": "/contact-list/static/js/2.fa698453.chunk.js",
+    "static/js/2.fa698453.chunk.js.map": "/contact-list/static/js/2.fa698453.chunk.js.map",
     "index.html": "/contact-list/index.html",
-    "precache-manifest.6a2428325cdc7abadd5151cb9178331b.js": "/contact-list/precache-manifest.6a2428325cdc7abadd5151cb9178331b.js",
+    "precache-manifest.697b05329f70e537025b747c0af78ca7.js": "/contact-list/precache-manifest.697b05329f70e537025b747c0af78ca7.js",
     "service-worker.js": "/contact-list/service-worker.js",
     "static/css/2.8bd3faab.chunk.css.map": "/contact-list/static/css/2.8bd3faab.chunk.css.map",
-    "static/css/main.a2b577cf.chunk.css.map": "/contact-list/static/css/main.a2b577cf.chunk.css.map",
-    "static/js/2.6c9fa1ed.chunk.js.LICENSE.txt": "/contact-list/static/js/2.6c9fa1ed.chunk.js.LICENSE.txt",
+    "static/css/main.4c58e83f.chunk.css.map": "/contact-list/static/css/main.4c58e83f.chunk.css.map",
+    "static/js/2.fa698453.chunk.js.LICENSE.txt": "/contact-list/static/js/2.fa698453.chunk.js.LICENSE.txt",
     "static/media/all.min.css": "/contact-list/static/media/fa-solid-900.cdfec5cf.woff",
     "static/media/style.scss": "/contact-list/static/media/icomoon.da7ea5e1.ttf",
     "static/media/index.css": "/contact-list/static/media/roboto-latin-900italic.ebf6d164.woff2"
@@ -21,8 +21,8 @@
   "entrypoints": [
     "static/js/runtime-main.8add0db0.js",
     "static/css/2.8bd3faab.chunk.css",
-    "static/js/2.6c9fa1ed.chunk.js",
-    "static/css/main.a2b577cf.chunk.css",
-    "static/js/main.82d61ac1.chunk.js"
+    "static/js/2.fa698453.chunk.js",
+    "static/css/main.4c58e83f.chunk.css",
+    "static/js/main.3844cf5f.chunk.js"
   ]
 }
