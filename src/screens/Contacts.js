@@ -223,6 +223,7 @@ class Local extends React.Component {
       searchQuery: "",
       totalPages: 0,
       currPage: 0,
+      loading: true,
     };
   }
 
@@ -241,27 +242,33 @@ class Local extends React.Component {
   }
 
   listAPICall = () => {
-    const totalPages = this.findTotalPages(contacts.length);
+    setTimeout(() => {
+      const totalPages = this.findTotalPages(contacts.length);
 
-    this.setState({
-      data: contacts,
-      totalPages,
-      currPage: 0,
-    });
+      this.setState({
+        data: contacts,
+        totalPages,
+        currPage: 0,
+        loading: false,
+      });
+    }, 1000);
   }
 
   searchAPICall = (value) => {
-    const filteredData = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(value.toLowerCase())
-    );
+    setTimeout(() => {
+      const filteredData = contacts.filter(contact =>
+        contact.name.toLowerCase().includes(value.toLowerCase())
+      );
 
-    const totalPages = this.findTotalPages(filteredData.length);
+      const totalPages = this.findTotalPages(filteredData.length);
 
-    this.setState({
-      data: filteredData,
-      totalPages,
-      currPage: 0,
-    })
+      this.setState({
+        data: filteredData,
+        totalPages,
+        currPage: 0,
+        loading: false,
+      });
+    }, 1000);
   }
 
   componentDidMount = () => {
@@ -421,6 +428,7 @@ class Local extends React.Component {
     this.searchAPICall(value);
 
     this.setState({
+      loading: true,
       searchQuery: value,
       editable: false,
       isAdding: false,
@@ -431,7 +439,7 @@ class Local extends React.Component {
   render = () => {
     const { classes } = this.props;
 
-    const { data, selectedContact, editable, isAdding, searchQuery, totalPages, currPage } = this.state;
+    const { data, selectedContact, editable, isAdding, searchQuery, totalPages, currPage, loading } = this.state;
 
     const allSelected = data.length && data.every(contact => contact.checked);
     const someSelected = data.some(contact => contact.checked);
@@ -458,6 +466,7 @@ class Local extends React.Component {
             searchRecord={this.searchContact}
           />
           <RecordList
+            loading={loading}
             totalPages={totalPages}
             currPage={currPage}
             changePage={this.setPageNo}

@@ -130,6 +130,7 @@ class Shows extends React.Component {
       searchQuery: "",
       totalPages: 0,
       currPage: 0,
+      loading: true,
     };
   }
 
@@ -175,6 +176,7 @@ class Shows extends React.Component {
         shows: modifiedData,
         totalPages,
         currPage: 0,
+        loading: false,
       });
     }).catch((error) => {
       console.log(error);
@@ -329,6 +331,10 @@ class Shows extends React.Component {
         tempShows = shows;
       }
 
+      this.setState({
+        loading: true,
+      });
+
       this.apiCall(`https://api.tvmaze.com/search/shows?q=${value}`, true);
     } else {
       const totalPages = this.findTotalPages(tempShows.length);
@@ -350,7 +356,7 @@ class Shows extends React.Component {
   render = () => {
     const { classes } = this.props;
 
-    const { shows, selectedShow, editable, isAdding, searchQuery, totalPages, currPage } = this.state;
+    const { shows, selectedShow, editable, isAdding, searchQuery, totalPages, currPage, loading } = this.state;
 
     const allSelected = shows.length && shows.every(show => show.checked);;
     const someSelected = shows.some(show => show.checked);
@@ -377,6 +383,7 @@ class Shows extends React.Component {
             searchRecord={this.searchShow}
           />
           <RecordList
+            loading={loading}
             totalPages={totalPages}
             currPage={currPage}
             changePage={this.setPageNo}

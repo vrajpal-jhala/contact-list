@@ -137,6 +137,7 @@ class Pokedex extends React.Component {
       searchQuery: "",
       totalPages: 0,
       currPage: 0,
+      loading: true,
     };
 
     const cache = new InMemoryCache();
@@ -233,6 +234,7 @@ class Pokedex extends React.Component {
         pokedex: pokemons,
         totalPages,
         currPage: 0,
+        loading: false,
       });
     }).catch(error =>
       console.error(error)
@@ -251,6 +253,7 @@ class Pokedex extends React.Component {
         pokedex: pokemons,
         totalPages,
         currPage: 0,
+        loading: false,
       });
     }).catch(error =>
       console.error(error)
@@ -401,6 +404,7 @@ class Pokedex extends React.Component {
     value === '' ? this.listAPICall() : this.searchAPICall(value);
 
     this.setState({
+      loading: true,
       searchQuery: value,
       editable: false,
       isAdding: false,
@@ -411,7 +415,7 @@ class Pokedex extends React.Component {
   render = () => {
     const { classes } = this.props;
 
-    const { pokedex, selectedPokemon, editable, isAdding, searchQuery, totalPages, currPage } = this.state;
+    const { pokedex, selectedPokemon, editable, isAdding, searchQuery, totalPages, currPage, loading } = this.state;
 
     const allSelected = pokedex.length && pokedex.every(pokemon => pokemon.checked);;
     const someSelected = pokedex.some(pokemon => pokemon.checked);
@@ -438,6 +442,7 @@ class Pokedex extends React.Component {
             searchRecord={this.searchPokemon}
           />
           <RecordList
+            loading={loading}
             totalPages={totalPages}
             currPage={currPage}
             changePage={this.setPageNo}
