@@ -3,12 +3,50 @@ import RecordListHeader from './RecordListHeader';
 import RecordListBody from './RecordListBody';
 import {
   Grid,
+  makeStyles,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
 
-const RecordList = ({ loading, totalPages, currPage, changePage, records, selectedRecord, selectRecord, editRecord, isEditing, updateRecord, saveRecord, isAdding, checkRecord, someSelected, allSelected, selectAll, deselectAll, deselectRecord, cancelAddRecord, listSchema, addRecordFormSchema, updateRecordFormSchema }) => {
+const useStyle = makeStyles(theme => ({
+  border: {
+    boxShadow: '0px 0px 4px silver',
+    height: 'min-content',
+  },
+  spacing: {
+    padding: '10px 15px',
+  },
+  flex: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  select: {
+    marginLeft: 5,
+  },
+}));
+
+const RecordList = ({ totalRecords, pageLength, changePageLength, someSelected, allSelected, selectAll, deselectAll, listSchema, ...recordListBodyProps }) => {
+
+  const classes = useStyle();
 
   return (
-    <Grid item lg={6} xs={12}>
+    <Grid item lg={6} xs={12} className={classes.border}>
+      <div className={`${classes.spacing} ${classes.flex}`}>
+        <span>Records: {totalRecords}</span>
+        <span className={classes.flex}>
+          Length:
+          <Select
+            value={pageLength}
+            onChange={changePageLength}
+            className={classes.select}
+          >
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={30}>30</MenuItem>
+          </Select>
+        </span>
+      </div>
       <RecordListHeader
         someSelected={someSelected}
         allSelected={allSelected}
@@ -17,24 +55,8 @@ const RecordList = ({ loading, totalPages, currPage, changePage, records, select
         listSchema={listSchema}
       />
       <RecordListBody
-        loading={loading}
-        totalPages={totalPages}
-        currPage={currPage}
-        changePage={changePage}
-        records={records}
-        selectedRecord={selectedRecord}
-        selectRecord={selectRecord}
-        editRecord={editRecord}
-        isEditing={isEditing}
-        updateRecord={updateRecord}
-        isAdding={isAdding}
-        saveRecord={saveRecord}
-        checkRecord={checkRecord}
-        deselectRecord={deselectRecord}
-        cancelAddRecord={cancelAddRecord}
         listSchema={listSchema}
-        addRecordFormSchema={addRecordFormSchema}
-        updateRecordFormSchema={updateRecordFormSchema}
+        {...recordListBodyProps}
       />
     </Grid>
   );

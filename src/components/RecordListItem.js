@@ -13,8 +13,9 @@ import {
 
 const useStyle = makeStyles(theme => ({
   record: {
-    margin: '10px 0px',
+    margin: '5px 0px',
     padding: '0px 10px',
+    height: 'max-content',
     '&:hover,&.selected': {
       backgroundColor: '#e8ecef',
       cursor: 'pointer',
@@ -60,13 +61,13 @@ const RecordListItem = ({ record, isSelected, selectRecord, checkRecord, listSch
   }
 
   return (
-    <Grid container
+    <Grid item container
       alignItems="center"
       className={clsx(classes.record, isSelected && 'selected')}
       onClick={() => selectRecord(id)}
     >
       <Grid item md={1} xs={2} sm={2}>
-        <Tooltip title="Selecte Item">
+        <Tooltip arrow title="Selecte Item">
           <Checkbox
             onClick={(event) => { checkRecord(id); event.stopPropagation(); }}
             color="primary"
@@ -77,29 +78,39 @@ const RecordListItem = ({ record, isSelected, selectRecord, checkRecord, listSch
       <Grid item md={5} xs={10} sm={9}>
         <Box className={classes.infoCol}>
           <Box className={classes.avatarWrapper}>
-            <Avatar
-              src={avatar}
-              className={classes.avatar}
-              style={{
-                backgroundColor: stringToColour(record[col1.key] + record[col2.key])
-              }}
-            >
-              {record[col1.key].split(" ").map((n) => n[0])}
-            </Avatar>
+            <Tooltip arrow title="Avatar">
+              <Avatar
+                src={avatar}
+                className={classes.avatar}
+                style={{
+                  backgroundColor: stringToColour(record[col1.key] + record[col2.key])
+                }}
+              >
+                {record[col1.key].split(" ").map((n) => n[0])}
+              </Avatar>
+            </Tooltip>
           </Box>
           <Box className={classes.infoBody} minWidth={0}>
-            <Typography noWrap variant="subtitle1"><b>{record[col1.key]}</b></Typography>
-            <small>
-              <Hidden mdUp>
-                <Typography noWrap>{record[col2.key]}</Typography>
-              </Hidden>
-            </small>
+            <Typography noWrap variant="subtitle1">
+              <Tooltip arrow title={col1.name}>
+                <b>{record[col1.key]}</b>
+              </Tooltip>
+            </Typography>
+            <Hidden mdUp>
+              <Typography noWrap>
+                <Tooltip arrow title={col2.name}>
+                  <small>{record[col2.key]}</small>
+                </Tooltip>
+              </Typography>
+            </Hidden>
           </Box>
         </Box>
       </Grid>
       <Hidden smDown>
         <Grid item md={6} zeroMinWidth>
-          <Typography noWrap variant="subtitle1"><b>{record[col2.key]}</b></Typography>
+          <Typography noWrap variant="subtitle1">
+            <Tooltip arrow title={col2.name}><b>{record[col2.key]}</b></Tooltip>
+          </Typography>
         </Grid>
       </Hidden>
     </Grid>

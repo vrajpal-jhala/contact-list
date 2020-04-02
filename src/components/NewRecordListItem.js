@@ -28,6 +28,9 @@ const useStyle = makeStyles(theme => ({
     flexDirection: "column",
     justifyContent: "center"
   },
+  fieldPadding: {
+    padding: '0px 5px',
+  },
   saveBtn: {
     background: "linear-gradient(to right, #ffffff, #e8ecef)",
     color: "#000000bf",
@@ -38,7 +41,11 @@ const useStyle = makeStyles(theme => ({
     maxHeight: 30,
     minHeight: 30,
     borderRadius: "50%",
-    boxShadow: "1px 1px 2px grey"
+    boxShadow: "1px 1px 2px grey",
+    '&:hover': {
+      color: '#000',
+      background: 'linear-gradient(to right, #e1e1e1, #b7b7b7)',
+    },
   },
   closeBtn: {
     background: "linear-gradient(to right, #fa8569, #ff4b6e)",
@@ -50,21 +57,27 @@ const useStyle = makeStyles(theme => ({
     maxHeight: 30,
     minHeight: 30,
     borderRadius: "50%",
-    boxShadow: "1px 1px 2px grey"
+    boxShadow: "1px 1px 2px grey",
+    '&:hover': {
+      color: '#fff',
+      background: 'linear-gradient(to right, #ff6641, #ff2a53)',
+    },
   }
 }));
 
 const InputField = ({ input, validate }) => {
+  const classes = useStyle();
   const { field, handleKeyDown, autoFocus } = input;
   const { label, name, placeholder, inputProps, validations } = field;
   const { error, register, errors } = validate;
+
   const resError = error.field === name,
     helperText = (errors[name] && errors[name].message) || (resError && error.message) || ' ';
   const hasError = errors[name] !== undefined || resError;
   return (
-    <>
+    <Box className={classes.fieldPadding}>
       <InputLabel error={hasError}>{label}</InputLabel>
-      <Tooltip title={label}>
+      <Tooltip arrow title={label} disableFocusListener={true}>
         <Input
           autoFocus={autoFocus}
           name={name}
@@ -79,7 +92,7 @@ const InputField = ({ input, validate }) => {
       <FormHelperText error={hasError}>
         {helperText}
       </FormHelperText>
-    </>
+    </Box>
   )
 };
 
@@ -110,6 +123,7 @@ const NewRecordListItem = ({ saveRecord, cancelAddRecord, formSchema }) => {
   }
 
   const onSave = data => {
+    Object.keys(data).forEach(k => data[k] = typeof data[k] == 'string' ? data[k].trim() : data[k]);
     const { status, error } = saveRecord(data);
     if (!status) setError(error);
   };
@@ -135,12 +149,12 @@ const NewRecordListItem = ({ saveRecord, cancelAddRecord, formSchema }) => {
           </Grid>
         </Hidden>
         <Grid item xs={4} sm={2} container justify="flex-end">
-          <Tooltip title="Save">
+          <Tooltip arrow title="Save">
             <Button type="submit" className={classes.saveBtn}>
               <Check />
             </Button>
           </Tooltip>
-          <Tooltip title="Cancel">
+          <Tooltip arrow title="Cancel">
             <Button
               className={classes.closeBtn}
               onClick={() => cancelAddRecord()}

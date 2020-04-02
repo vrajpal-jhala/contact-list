@@ -9,7 +9,7 @@ import {
 
 const useStyle = makeStyles(theme => ({
   contactListHeader: {
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#ddd',
     padding: '5px 10px',
   }
 }));
@@ -24,7 +24,7 @@ const ContactListHeader = ({ someSelected, allSelected, deselectAll, selectAll, 
     <Grid container className={classes.contactListHeader}>
       <Grid item container xs={12} style={{ alignItems: 'center' }}>
         <Grid item md={1} xs={2} sm={2}>
-          <Tooltip title="Select/Deselect All" placement="top">
+          <Tooltip arrow title="Select/Deselect All" placement="top">
             <Checkbox
               onClick={() => allSelected || someSelected ? deselectAll() : selectAll()}
               color="primary"

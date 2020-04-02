@@ -119,6 +119,8 @@ let formSchema = {
   ],
 };
 
+formSchema.fields = prepareValidations(formSchema.fields);
+
 const miniFormSchema = {
   field1: formSchema.fields[0],
   field2: formSchema.fields[1],
@@ -135,8 +137,9 @@ class Pokedex extends React.Component {
       editable: false,
       isAdding: false,
       searchQuery: "",
-      totalPages: 0,
+      totalRecords: 0,
       currPage: 0,
+      pageLength: 10,
       loading: true,
     };
 
@@ -169,36 +172,17 @@ class Pokedex extends React.Component {
       }`;
   }
 
-  searchQuery = (value) => {
-    return `
-      query searchPokemon{
-        pokemon(name: "${value}") {
-          id
-          image
-          name
-          classification
-          types
-          maxCP
-          maxHP
-          evolutions {
-            name
-          }
-        }
-      }`;
-  }
-
-  getPage = () => {
-    const { pokedex, currPage } = this.state;
-    const perPage = 10;
-    const start = currPage * perPage;
-    const end = start + perPage;
+  getPage = (pokedex) => {
+    const { currPage, pageLength } = this.state;
+    const start = currPage * pageLength;
+    const end = start + pageLength;
 
     return pokedex.slice(start, end);
   }
 
   findTotalPages = (totalRecords) => {
-    const perPage = 10;
-    return Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
+    const { pageLength } = this.state;
+    return Math.floor(totalRecords / pageLength) + (totalRecords % pageLength && 1);
   }
 
   prepareObj = (pokemon) => {
@@ -224,7 +208,7 @@ class Pokedex extends React.Component {
       query: gql`${this.listQuery()}`,
     }).then(({ data }) => {
       var { pokemons } = data;
-      const totalPages = this.findTotalPages(pokemons.length);
+      const totalRecords = pokemons.length;
 
       pokemons = pokemons.map((pokemon) =>
         this.prepareObj(pokemon)
@@ -232,7 +216,7 @@ class Pokedex extends React.Component {
 
       this.setState({
         pokedex: pokemons,
-        totalPages,
+        totalRecords,
         currPage: 0,
         loading: false,
       });
@@ -242,22 +226,19 @@ class Pokedex extends React.Component {
   }
 
   searchAPICall = (query) => {
-    this.client.query({
-      query: gql`${this.searchQuery(query)}`,
-    }).then(({ data }) => {
-      var { pokemon } = data;
-      const pokemons = (pokemon && [this.prepareObj(pokemon)]) || [];
-      const totalPages = this.findTotalPages(pokemons.length);
-
-      this.setState({
-        pokedex: pokemons,
-        totalPages,
-        currPage: 0,
-        loading: false,
-      });
-    }).catch(error =>
-      console.error(error)
+    const { pokedex } = this.state;
+    const filteredData = pokedex.filter(pokemon =>
+      pokemon.name.toLowerCase().includes(query.toLowerCase())
     );
+
+    const totalRecords = filteredData.length;
+
+    this.setState({
+      pokedex: filteredData,
+      totalRecords,
+      currPage: 0,
+      loading: false,
+    });
   }
 
   componentDidMount = () => {
@@ -268,6 +249,13 @@ class Pokedex extends React.Component {
     this.setState({
       currPage: pageNo - 1,
       selectedPokemon: undefined,
+    });
+  }
+
+  changePageLength = ({ target }) => {
+    const { value } = target;
+    this.setState({
+      pageLength: value,
     });
   }
 
@@ -341,14 +329,15 @@ class Pokedex extends React.Component {
       ...newPokemon,
     });
 
-    const totalPages = this.findTotalPages(pokedex.length);
+    const totalRecords = pokedex.length;
+    const totalPages = this.findTotalPages(totalRecords);
 
     this.setState({
       pokedex: pokedex,
       isAdding: false,
       selectedPokemon: pokedex[pokedex.length - 1],
       searchQuery: "",
-      totalPages,
+      totalRecords,
       currPage: totalPages - 1,
     });
 
@@ -387,7 +376,8 @@ class Pokedex extends React.Component {
     var { pokedex, currPage } = this.state;
     pokedex = pokedex.filter(pokemon => !pokemon.checked);
 
-    const totalPages = this.findTotalPages(pokedex.length);
+    const totalRecords = pokedex.length;
+    const totalPages = this.findTotalPages(totalRecords);
 
     this.setState({
       pokedex: pokedex,
@@ -395,16 +385,14 @@ class Pokedex extends React.Component {
       isAdding: false,
       selectedPokemon: undefined,
       searchQuery: "",
-      totalPages,
+      totalRecords,
       currPage: currPage >= (totalPages - 1) ? currPage - 1 >= 0 ? currPage - 1 : 0 : currPage,
     });
   }
 
   searchPokemon = (value) => {
-    value === '' ? this.listAPICall() : this.searchAPICall(value);
-
     this.setState({
-      loading: true,
+      currPage: 0,
       searchQuery: value,
       editable: false,
       isAdding: false,
@@ -413,70 +401,84 @@ class Pokedex extends React.Component {
   }
 
   render = () => {
-    const { classes } = this.props;
+    const { classes, handleFullDrawerToggle } = this.props;
 
-    const { pokedex, selectedPokemon, editable, isAdding, searchQuery, totalPages, currPage, loading } = this.state;
+    const { pokedex, selectedPokemon, editable, isAdding, searchQuery, currPage, pageLength, loading } = this.state;
 
     const allSelected = pokedex.length && pokedex.every(pokemon => pokemon.checked);;
     const someSelected = pokedex.some(pokemon => pokemon.checked);
 
-    formSchema.fields = prepareValidations(formSchema.fields);
+    const filteredData = pokedex.filter(pokemon =>
+      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-    const pageData = this.getPage();
+    const totalRecords = filteredData.length;
+    const totalPages = this.findTotalPages(totalRecords);
+    const pageData = this.getPage(filteredData);
 
     return (
-      <Grid container className={classes.outerSpacing}>
+      <>
         <SceneHeader
+          handleFullDrawerToggle={handleFullDrawerToggle}
           icon="icon-pokeball"
           heading="Pokedex"
           subHeading="Welcome to Pokedex page"
         />
-        <Grid container item md={12} className={classes.innerSpacing}>
-          <ActionBar
-            recordType="pokemon"
-            searchLimit={{ maxLength: 20 }}
-            searchValue={searchQuery}
-            someSelected={someSelected}
-            addRecord={this.addPokemon}
-            deleteRecord={this.deletePokemon}
-            searchRecord={this.searchPokemon}
-          />
-          <RecordList
-            loading={loading}
-            totalPages={totalPages}
-            currPage={currPage}
-            changePage={this.setPageNo}
-            records={pageData}
-            selectedRecord={selectedPokemon}
-            selectRecord={this.setSelectedPokemon}
-            editRecord={this.setEditable}
-            updateRecord={this.updatePokemon}
-            isEditing={editable}
-            isAdding={isAdding}
-            saveRecord={this.savePokemon}
-            checkRecord={this.checkPokemon}
-            selectAll={this.selectAll}
-            deselectAll={this.deselectAll}
-            allSelected={allSelected}
-            someSelected={someSelected}
-            deselectRecord={this.deselectPokemon}
-            cancelAddRecord={this.cancelAddPokemon}
-            listSchema={listSchema}
-            addRecordFormSchema={miniFormSchema}
-            updateRecordFormSchema={formSchema}
-          />
-          <Hidden mdDown>
-            <RecordForm
-              record={selectedPokemon}
-              editable={editable}
+        <Grid container className={classes.outerSpacing}>
+          <Grid container item md={12} className={classes.innerSpacing}>
+            <ActionBar
+              recordType="pokemon"
+              searchLimit={{ maxLength: 20 }}
+              searchValue={searchQuery}
+              totalRecords={totalRecords}
+              someSelected={someSelected}
+              addRecord={this.addPokemon}
+              deleteRecord={this.deletePokemon}
+              searchRecord={this.searchPokemon}
+            />
+            <RecordList
+              loading={loading}
+              pageLength={pageLength}
+              changePageLength={this.changePageLength}
+              totalRecords={totalRecords}
+              totalPages={totalPages}
+              currPage={currPage}
+              changePage={this.setPageNo}
+              records={pageData}
+              selectedRecord={selectedPokemon}
+              selectRecord={this.setSelectedPokemon}
               editRecord={this.setEditable}
               updateRecord={this.updatePokemon}
-              goBack={this.deselectPokemon}
-              formSchema={formSchema}
+              isEditing={editable}
+              isAdding={isAdding}
+              saveRecord={this.savePokemon}
+              checkRecord={this.checkPokemon}
+              selectAll={this.selectAll}
+              deselectAll={this.deselectAll}
+              allSelected={allSelected}
+              someSelected={someSelected}
+              deselectRecord={this.deselectPokemon}
+              cancelAddRecord={this.cancelAddPokemon}
+              listSchema={listSchema}
+              addRecordFormSchema={miniFormSchema}
+              updateRecordFormSchema={formSchema}
             />
-          </Hidden>
+            {
+              selectedPokemon &&
+              <Hidden mdDown>
+                <RecordForm
+                  record={selectedPokemon}
+                  editable={editable}
+                  editRecord={this.setEditable}
+                  updateRecord={this.updatePokemon}
+                  goBack={this.deselectPokemon}
+                  formSchema={formSchema}
+                />
+              </Hidden>
+            }
+          </Grid>
         </Grid>
-      </Grid>
+      </>
     );
   }
 }

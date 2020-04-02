@@ -21,26 +21,22 @@ const maxLengthValidation = (limit) => {
 const prepareValidations = (fields) => fields.map(({ validations, ...field }) => {
   const { name } = field;
 
-  validations = Object.entries(validations).map(([key, value]) => {
-    var obj = {};
-
+  Object.entries(validations).forEach(([key, value]) => {
     switch (key) {
       case 'required':
-        obj["required"] = requiredValidation();
+        validations["required"] = requiredValidation();
         break;
       case 'pattern':
-        obj["pattern"] = patternValidation(name, value);
+        validations["pattern"] = patternValidation(name, value);
         break;
       case 'minLength':
-        obj["minLength"] = minLengthValidation(value);
+        validations["minLength"] = minLengthValidation(value);
         break;
       case 'maxLength':
-        obj["maxLength"] = maxLengthValidation(value);
+        validations["maxLength"] = maxLengthValidation(value);
         break;
       default:
     }
-
-    return obj;
   });
 
   return { ...field, validations };

@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import clsx from 'clsx';
 import AppDrawer from './components/AppDrawer';
-import AppHeader from './components/AppHeader';
 import Contacts from './screens/Contacts';
 import Shows from './screens/Shows';
 import Pokedex from './screens/Pokedex';
@@ -73,18 +72,21 @@ class ContactApp extends React.Component {
             handleMiniDrawerToggle={this.handleMiniDrawerToggle}
           />
           <div className={clsx(classes.content, drawer === "open" && classes.contentPosition)}>
-            <AppHeader
-              handleFullDrawerToggle={this.handleFullDrawerToggle}
-            />
             <Switch>
               <Route exact path={"/"} key={"Contacts"}>
-                <Contacts />
+                <Contacts
+                  handleFullDrawerToggle={this.handleFullDrawerToggle}
+                />
               </Route>
               <Route exact path={"/shows"} key={"Shows"}>
-                <Shows />
+                <Shows
+                  handleFullDrawerToggle={this.handleFullDrawerToggle}
+                />
               </Route>
               <Route exact path={"/pokedex"} key={"Pokedex"}>
-                <Pokedex />
+                <Pokedex
+                  handleFullDrawerToggle={this.handleFullDrawerToggle}
+                />
               </Route>
             </Switch>
           </div>

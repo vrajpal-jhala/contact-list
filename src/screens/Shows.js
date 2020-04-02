@@ -25,8 +25,6 @@ const styles = theme => ({
   }
 });
 
-let tempShows = [];
-
 const listSchema = {
   col1: { name: 'Name', key: 'name' },
   col2: { name: 'Network', key: 'network' },
@@ -99,6 +97,7 @@ let formSchema = {
       label: 'Summary',
       name: 'summary',
       placeholder: 'What it\'s all about',
+      multiline: true,
       inputProps: {
         maxLength: 500,
       },
@@ -111,6 +110,8 @@ let formSchema = {
     },
   ],
 };
+
+formSchema.fields = prepareValidations(formSchema.fields);
 
 const miniFormSchema = {
   field1: formSchema.fields[0],
@@ -128,24 +129,23 @@ class Shows extends React.Component {
       editable: false,
       isAdding: false,
       searchQuery: "",
-      totalPages: 0,
       currPage: 0,
+      pageLength: 10,
       loading: true,
     };
   }
 
-  getPage = () => {
-    const { shows, currPage } = this.state;
-    const perPage = 10;
-    const start = currPage * perPage;
-    const end = start + perPage;
+  getPage = (shows) => {
+    const { currPage, pageLength } = this.state;
+    const start = currPage * pageLength;
+    const end = start + pageLength;
 
     return shows.slice(start, end);
   }
 
   findTotalPages = (totalRecords) => {
-    const perPage = 10;
-    return Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
+    const { pageLength } = this.state;
+    return Math.floor(totalRecords / pageLength) + (totalRecords % pageLength && 1);
   }
 
   apiCall = (url, search) => {
@@ -191,7 +191,14 @@ class Shows extends React.Component {
     this.setState({
       currPage: pageNo - 1,
       selectedShow: undefined,
-    })
+    });
+  }
+
+  changePageLength = ({ target }) => {
+    const { value } = target;
+    this.setState({
+      pageLength: value,
+    });
   }
 
   setSelectedShow = (id) => {
@@ -271,7 +278,6 @@ class Shows extends React.Component {
       isAdding: false,
       selectedShow: shows[shows.length - 1],
       searchQuery: "",
-      totalPages,
       currPage: totalPages - 1,
     });
 
@@ -318,33 +324,11 @@ class Shows extends React.Component {
       isAdding: false,
       selectedShow: undefined,
       searchQuery: "",
-      totalPages,
       currPage: currPage >= (totalPages - 1) ? currPage - 1 >= 0 ? currPage - 1 : 0 : currPage,
     });
   }
 
   searchShow = (value) => {
-    const { shows } = this.state;
-
-    if (value !== '') {
-      if (tempShows.length === 0) {
-        tempShows = shows;
-      }
-
-      this.setState({
-        loading: true,
-      });
-
-      this.apiCall(`https://api.tvmaze.com/search/shows?q=${value}`, true);
-    } else {
-      const totalPages = this.findTotalPages(tempShows.length);
-      this.setState({
-        shows: tempShows,
-        totalPages,
-        currPage: 0,
-      });
-    }
-
     this.setState({
       searchQuery: value,
       editable: false,
@@ -354,70 +338,84 @@ class Shows extends React.Component {
   }
 
   render = () => {
-    const { classes } = this.props;
+    const { classes, handleFullDrawerToggle } = this.props;
 
-    const { shows, selectedShow, editable, isAdding, searchQuery, totalPages, currPage, loading } = this.state;
+    const { shows, selectedShow, editable, isAdding, searchQuery, currPage, pageLength, loading } = this.state;
 
     const allSelected = shows.length && shows.every(show => show.checked);;
     const someSelected = shows.some(show => show.checked);
 
-    formSchema.fields = prepareValidations(formSchema.fields);
+    const filteredData = shows.filter(pokemon =>
+      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-    const pageData = this.getPage();
+    const totalRecords = filteredData.length;
+    const totalPages = this.findTotalPages(totalRecords);
+    const pageData = this.getPage(filteredData);
 
     return (
-      <Grid container className={classes.outerSpacing}>
+      <>
         <SceneHeader
+          handleFullDrawerToggle={handleFullDrawerToggle}
           icon="fas fa-tv"
           heading="TV Shows"
           subHeading="Welcome to TVMaze page"
         />
-        <Grid container item md={12} className={classes.innerSpacing}>
-          <ActionBar
-            recordType="show"
-            searchLimit={{ maxLength: 20 }}
-            searchValue={searchQuery}
-            someSelected={someSelected}
-            addRecord={this.addShow}
-            deleteRecord={this.deleteShow}
-            searchRecord={this.searchShow}
-          />
-          <RecordList
-            loading={loading}
-            totalPages={totalPages}
-            currPage={currPage}
-            changePage={this.setPageNo}
-            records={pageData}
-            selectedRecord={selectedShow}
-            selectRecord={this.setSelectedShow}
-            editRecord={this.setEditable}
-            updateRecord={this.updateShow}
-            isEditing={editable}
-            isAdding={isAdding}
-            saveRecord={this.saveShow}
-            checkRecord={this.checkShow}
-            selectAll={this.selectAll}
-            deselectAll={this.deselectAll}
-            allSelected={allSelected}
-            someSelected={someSelected}
-            deselectRecord={this.deselectShow}
-            cancelAddRecord={this.cancelAddShow}
-            listSchema={listSchema}
-            addRecordFormSchema={miniFormSchema}
-            updateRecordFormSchema={formSchema}
-          />
-          <Hidden mdDown>
-            <RecordForm
-              record={selectedShow}
-              editable={editable}
+        <Grid container className={classes.outerSpacing}>
+          <Grid container item md={12} className={classes.innerSpacing}>
+            <ActionBar
+              recordType="show"
+              searchLimit={{ maxLength: 20 }}
+              searchValue={searchQuery}
+              totalRecords={totalRecords}
+              someSelected={someSelected}
+              addRecord={this.addShow}
+              deleteRecord={this.deleteShow}
+              searchRecord={this.searchShow}
+            />
+            <RecordList
+              loading={loading}
+              pageLength={pageLength}
+              changePageLength={this.changePageLength}
+              totalRecords={totalRecords}
+              totalPages={totalPages}
+              currPage={currPage}
+              changePage={this.setPageNo}
+              records={pageData}
+              selectedRecord={selectedShow}
+              selectRecord={this.setSelectedShow}
               editRecord={this.setEditable}
               updateRecord={this.updateShow}
-              goBack={this.deselectShow}
-              formSchema={formSchema}
+              isEditing={editable}
+              isAdding={isAdding}
+              saveRecord={this.saveShow}
+              checkRecord={this.checkShow}
+              selectAll={this.selectAll}
+              deselectAll={this.deselectAll}
+              allSelected={allSelected}
+              someSelected={someSelected}
+              deselectRecord={this.deselectShow}
+              cancelAddRecord={this.cancelAddShow}
+              listSchema={listSchema}
+              addRecordFormSchema={miniFormSchema}
+              updateRecordFormSchema={formSchema}
             />
-          </Hidden>
+            {
+              selectedShow &&
+              <Hidden mdDown>
+                <RecordForm
+                  record={selectedShow}
+                  editable={editable}
+                  editRecord={this.setEditable}
+                  updateRecord={this.updateShow}
+                  goBack={this.deselectShow}
+                  formSchema={formSchema}
+                />
+              </Hidden>
+            }
+          </Grid>
         </Grid>
-      </Grid>
+      </>
     );
   }
 }

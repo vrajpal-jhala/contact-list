@@ -30,7 +30,7 @@ let contacts = [
     name: "Joey Tribbiani",
     about: "Actor",
     email: "joeyt@friends.com",
-    phone: "+(069) 123-6547",
+    phone: "+(069) 1236547",
     company: "Actor Acadamy",
     address: "2738  Liberty Avenue, California"
   },
@@ -39,7 +39,7 @@ let contacts = [
     name: "Rachel Green",
     about: "Fashion Designer",
     email: "greenrach@friends.com",
-    phone: "718-896-1555",
+    phone: "+(91) 7188961555",
     company: "Ralph Lauren",
     address: "377  Abia Martin Drive, Bethpage, New York"
   },
@@ -48,7 +48,7 @@ let contacts = [
     name: "Ross Geller",
     about: "Paleontologist",
     email: "rossaurus@friends.com",
-    phone: "",
+    phone: "+(12) 4564554988",
     company: "Dianosaur Museum",
     address: "4437  Plainfield Avenue, HOPKINTON, Massachusetts"
   },
@@ -57,26 +57,26 @@ let contacts = [
     name: "Phoebe Buffay",
     about: "Masseuse",
     email: "phebes@friends.com",
-    phone: "802-232-8909",
-    company: "",
-    address: ""
+    phone: "+(6) 8022328909",
+    company: "Parlor",
+    address: "216, Some Place, Somewhere"
   },
   {
     id: "5",
     name: "Monica Geller",
     about: "Chef",
     email: "mon@friends.com",
-    phone: "",
-    company: "",
-    address: ""
+    phone: "+(5) 456789",
+    company: "Restaurant",
+    address: "754, Some Appartment, New York"
   },
   {
     id: "6",
     name: "Chandler Bing",
     about: "Copywriter",
     email: "mrbing@friends.com",
-    phone: "",
-    company: "",
+    phone: "+(123) 8098009009",
+    company: "Advertising",
     address: "4709  Roosevelt Road, Dodge City, Kansas"
   },
   {
@@ -84,17 +84,17 @@ let contacts = [
     name: "Gunther",
     about: "Cafe Owner",
     email: "gunther@friends.com",
-    phone: "330-443-9039",
+    phone: "+(15) 3304439039",
     company: "Central Perk",
-    address: ""
+    address: "213/B, Gotham City, United States"
   },
   {
     id: "8",
     name: "Jill Green",
     about: "Rachel's sister",
     email: "jgreen@gmail.com",
-    phone: "",
-    company: "",
+    phone: "+(45) 79754698",
+    company: "Shopping Mall",
     address: "2035  Nixon Avenue, Kingsport, Tennessee"
   },
   {
@@ -102,9 +102,27 @@ let contacts = [
     name: "Jack Geller",
     about: "Ross' father",
     email: "jackg@gmail.com",
-    phone: "908-617-5594",
+    phone: "+(51) 9086175594",
     company: "",
     address: "3033  Patterson Road, SPANGLE, Washington"
+  },
+  {
+    id: "10",
+    name: "Jennis Hosenstein",
+    about: "Chandler's ex",
+    email: "jen@gmail.com",
+    phone: "+(87) 24264578",
+    company: "Some Company",
+    address: "35  X Road, Zee, New York"
+  },
+  {
+    id: "11",
+    name: "Ben Geller",
+    about: "Ross' son",
+    email: "ben@yahoo.com",
+    phone: "+(56) 654897981",
+    company: "School",
+    address: "30  Zee, Time Square, New York"
   }
 ];
 
@@ -176,6 +194,7 @@ let formSchema = {
       label: 'Address',
       name: 'address',
       placeholder: '13/B, Unknown, Nowhere',
+      multiline: true,
       inputProps: {
         maxLength: 100,
       },
@@ -190,19 +209,22 @@ let formSchema = {
       label: 'About',
       name: 'about',
       placeholder: 'Who is this?',
+      multiline: true,
       inputProps: {
         maxLength: 50,
       },
       validations: {
         required: true,
         pattern: /[^\s]+/,
-        minLength: 10,
+        minLength: 5,
         maxLength: 50,
       },
       onEdit: true,
     }
   ],
 };
+
+formSchema.fields = prepareValidations(formSchema.fields);
 
 const miniFormSchema = {
   field1: formSchema.fields[0],
@@ -221,24 +243,23 @@ class Local extends React.Component {
       editable: false,
       isAdding: false,
       searchQuery: "",
-      totalPages: 0,
       currPage: 0,
+      pageLength: 10,
       loading: true,
     };
   }
 
-  getPage = () => {
-    const { data, currPage } = this.state;
-    const perPage = 10;
-    const start = currPage * perPage;
-    const end = start + perPage;
+  getPage = (contacts) => {
+    const { currPage, pageLength } = this.state;
+    const start = currPage * pageLength;
+    const end = start + pageLength;
 
-    return data.slice(start, end);
+    return contacts.slice(start, end);
   }
 
   findTotalPages = (totalRecords) => {
-    const perPage = 10;
-    return Math.floor(totalRecords / perPage) + (totalRecords % perPage && 1);
+    const { pageLength } = this.state;
+    return Math.floor(totalRecords / pageLength) + (totalRecords % pageLength && 1);
   }
 
   listAPICall = () => {
@@ -254,23 +275,6 @@ class Local extends React.Component {
     }, 1000);
   }
 
-  searchAPICall = (value) => {
-    setTimeout(() => {
-      const filteredData = contacts.filter(contact =>
-        contact.name.toLowerCase().includes(value.toLowerCase())
-      );
-
-      const totalPages = this.findTotalPages(filteredData.length);
-
-      this.setState({
-        data: filteredData,
-        totalPages,
-        currPage: 0,
-        loading: false,
-      });
-    }, 1000);
-  }
-
   componentDidMount = () => {
     this.listAPICall();
   }
@@ -279,6 +283,13 @@ class Local extends React.Component {
     this.setState({
       currPage: pageNo - 1,
       selectedContact: undefined,
+    });
+  }
+
+  changePageLength = ({ target }) => {
+    const { value } = target;
+    this.setState({
+      pageLength: value,
     });
   }
 
@@ -353,7 +364,7 @@ class Local extends React.Component {
   saveContact = ({ name, email }) => {
     const { selectedContact } = this.state;
 
-    var emailExist = contacts.some(contact => contact.email === email);
+    var emailExist = contacts.some(contact => contact.email !== '' && contact.email === email);
 
     if (emailExist) {
       return { status: false, error: { field: 'email', message: 'Email already exists' } };
@@ -371,7 +382,6 @@ class Local extends React.Component {
         isAdding: false,
         selectedContact: contacts[contacts.length - 1],
         searchQuery: "",
-        totalPages,
         currPage: totalPages - 1,
       });
 
@@ -419,88 +429,99 @@ class Local extends React.Component {
       editable: false,
       isAdding: false,
       selectedContact: undefined,
-      totalPages,
       currPage: currPage >= (totalPages - 1) ? currPage - 1 >= 0 ? currPage - 1 : 0 : currPage,
     });
   };
 
   searchContact = (value) => {
-    this.searchAPICall(value);
-
     this.setState({
-      loading: true,
+      currPage: 0,
       searchQuery: value,
       editable: false,
       isAdding: false,
-      selectedContact: undefined,
+      selectedPokemon: undefined,
     });
   };
 
   render = () => {
-    const { classes } = this.props;
+    const { classes, handleFullDrawerToggle } = this.props;
 
-    const { data, selectedContact, editable, isAdding, searchQuery, totalPages, currPage, loading } = this.state;
+    const { data, selectedContact, editable, isAdding, searchQuery, currPage, pageLength, loading } = this.state;
 
     const allSelected = data.length && data.every(contact => contact.checked);
     const someSelected = data.some(contact => contact.checked);
 
-    formSchema.fields = prepareValidations(formSchema.fields);
+    const filteredData = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-    const pageData = this.getPage();
+    const totalRecords = filteredData.length;
+    const totalPages = this.findTotalPages(totalRecords);
+    const pageData = this.getPage(filteredData);
 
     return (
-      <Grid container className={classes.outerSpacing}>
+      <>
         <SceneHeader
+          handleFullDrawerToggle={handleFullDrawerToggle}
           icon="fas fa-address-book fa-flip-horizontal"
           heading="Contacts"
           subHeading="Welcome to FirstCRM Contact page"
         />
-        <Grid container item md={12} className={classes.innerSpacing}>
-          <ActionBar
-            recordType="contact"
-            searchLimit={{ maxLength: 40 }}
-            searchValue={searchQuery}
-            someSelected={someSelected}
-            addRecord={this.addContact}
-            deleteRecord={this.deleteContact}
-            searchRecord={this.searchContact}
-          />
-          <RecordList
-            loading={loading}
-            totalPages={totalPages}
-            currPage={currPage}
-            changePage={this.setPageNo}
-            records={pageData}
-            selectedRecord={selectedContact}
-            selectRecord={this.setSelectedContact}
-            editRecord={this.setEditable}
-            updateRecord={this.updateContact}
-            isEditing={editable}
-            isAdding={isAdding}
-            saveRecord={this.saveContact}
-            checkRecord={this.checkContact}
-            selectAll={this.selectAll}
-            deselectAll={this.deselectAll}
-            allSelected={allSelected}
-            someSelected={someSelected}
-            deselectRecord={this.deselectContact}
-            cancelAddRecord={this.cancelAddContact}
-            listSchema={listSchema}
-            addRecordFormSchema={miniFormSchema}
-            updateRecordFormSchema={formSchema}
-          />
-          <Hidden mdDown>
-            <RecordForm
-              record={selectedContact}
-              editable={editable}
+        <Grid container className={classes.outerSpacing}>
+          <Grid container item md={12} className={classes.innerSpacing}>
+            <ActionBar
+              recordType="contact"
+              searchLimit={{ maxLength: 40 }}
+              searchValue={searchQuery}
+              totalRecords={totalRecords}
+              someSelected={someSelected}
+              addRecord={this.addContact}
+              deleteRecord={this.deleteContact}
+              searchRecord={this.searchContact}
+            />
+            <RecordList
+              loading={loading}
+              pageLength={pageLength}
+              changePageLength={this.changePageLength}
+              totalRecords={totalRecords}
+              totalPages={totalPages}
+              currPage={currPage}
+              changePage={this.setPageNo}
+              records={pageData}
+              selectedRecord={selectedContact}
+              selectRecord={this.setSelectedContact}
               editRecord={this.setEditable}
               updateRecord={this.updateContact}
-              goBack={this.deselectContact}
-              formSchema={formSchema}
+              isEditing={editable}
+              isAdding={isAdding}
+              saveRecord={this.saveContact}
+              checkRecord={this.checkContact}
+              selectAll={this.selectAll}
+              deselectAll={this.deselectAll}
+              allSelected={allSelected}
+              someSelected={someSelected}
+              deselectRecord={this.deselectContact}
+              cancelAddRecord={this.cancelAddContact}
+              listSchema={listSchema}
+              addRecordFormSchema={miniFormSchema}
+              updateRecordFormSchema={formSchema}
             />
-          </Hidden>
+            {
+              selectedContact &&
+              <Hidden mdDown>
+                <RecordForm
+                  record={selectedContact}
+                  editable={editable}
+                  editRecord={this.setEditable}
+                  updateRecord={this.updateContact}
+                  goBack={this.deselectContact}
+                  formSchema={formSchema}
+                />
+              </Hidden>
+            }
+          </Grid>
         </Grid>
-      </Grid>
+      </>
     );
   };
 }

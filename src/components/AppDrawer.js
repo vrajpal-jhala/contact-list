@@ -65,7 +65,7 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
         })
       }}
     >
-      <Tooltip title={open === "close" ? "Close" : "Open"} placement="right">
+      <Tooltip arrow title={open === "close" ? "Close" : "Open"}>
         <div className={classes.toggleBtn}>
           <IconButton color="inherit" onClick={handleMiniDrawerToggle}>
             {open === "open" ? <ChevronLeft /> : <ChevronRight />}
@@ -78,10 +78,10 @@ const AppDrawer = ({ open, handleMiniDrawerToggle }) => {
             { icon: <Local />, name: "Contacts", path: "/" },
             { icon: <LiveTv />, name: "Shows", path: "/shows" },
             { icon: <span className='icon-pokedex' />, name: "Pokedex", path: "/pokedex" }
-          ].map(({icon, name, path}) =>
-            <Tooltip title={name} placement="right" key={name}>
+          ].map(({ icon, name, path }) =>
+            <Tooltip arrow title={name} key={name}>
               <NavLink exact to={path}>
-                <ListItem button className="menuItem" >
+                <ListItem button className="menuItem">
                   <ListItemIcon className={classes.colorWhite}>{icon}</ListItemIcon>
                   <ListItemText primary={name} />
                 </ListItem>

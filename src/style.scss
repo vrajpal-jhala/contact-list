@@ -8,22 +8,18 @@ body {
   &:hover,
   &:focus {
     border-color: white !important;
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: rgba(0, 0, 0, 0.1) !important;
   }
 }
 
 a.active > .menuItem {
   border-color: white !important;
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 div[class*="Drawer"] a {
   text-decoration: none;
   color: #ffffffbf;
-}
-
-button:disabled {
-  color: #ddddddbf !important;
 }
 
 @font-face {
@@ -36,6 +32,19 @@ button:disabled {
   font-weight: normal;
   font-style: normal;
   font-display: block;
+}
+
+.MuiPaginationItem-root {
+  &.Mui-selected {
+    pointer-events: none;
+  }
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+[class*="MuiCheckbox"]:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 [class^="icon-"],

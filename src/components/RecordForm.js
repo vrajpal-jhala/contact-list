@@ -5,7 +5,6 @@ import {
   Grid,
   Box,
   Avatar,
-  Button,
   Input,
   Fab,
   FormHelperText,
@@ -13,6 +12,7 @@ import {
   Tooltip,
 } from "@material-ui/core";
 import { Check, Edit, Close, ArrowBack, Delete } from "@material-ui/icons";
+import ReactHtmlParser from 'react-html-parser';
 
 const useStyle = makeStyles(theme => ({
   extendedIcon: {
@@ -25,7 +25,7 @@ const useStyle = makeStyles(theme => ({
     }
   },
   recordForm: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#ddd",
     padding: "30px 40px",
     width: "100%",
     position: "relative",
@@ -53,69 +53,70 @@ const useStyle = makeStyles(theme => ({
     height: "80px",
     width: "80px",
   },
-  overlayEdit: {
-    position: 'absolute',
-    zIndex: 1,
-    borderRadius: '50%',
-    cursor: "pointer",
-    height: 80,
-    width: 80,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    color: '#ffffffbf',
-    opacity: 0,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    '&:hover': {
-      opacity: 1,
-    },
-  },
-  fallbackText: {
-    fontSize: 28
-  },
   marginTop: {
     marginTop: 20
   },
   saveBtn: {
     background: "linear-gradient(to right, #fa8569, #ff4b6e)",
-    color: "#ffffffbf"
+    color: "#ffffffbf",
+    marginTop: 20,
+    '&:hover': {
+      color: '#fff',
+      background: 'linear-gradient(to right, #ff6641, #ff2a53)',
+    },
+    [theme.breakpoints.only("xs")]: {
+      marginTop: 15,
+    },
   },
   formRow: {
     alignItems: "baseline",
-    padding: "10px 0px",
-    [theme.breakpoints.only("xs")]: {
-      padding: "10px 0px"
-    }
+    padding: "10px",
+    margin: '5px',
+    backgroundColor: '#ffffffbf',
   },
   editBtn: {
     background: "linear-gradient(to right, #fa8569, #ff4b6e)",
     color: "#ffffffbf",
     position: "absolute",
     right: 30,
+    '&:hover': {
+      color: '#fff',
+      background: 'linear-gradient(to right, #ff6641, #ff2a53)',
+    },
     [theme.breakpoints.only("xs")]: {
       right: 20
     }
   },
-  removeBtn: {
+  avatarBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
     position: "absolute",
     zIndex: 2,
-    bottom: 0,
     right: 0,
     background: "linear-gradient(to right, #fa8569, #ff4b6e)",
     color: "#ffffffbf",
     padding: 0,
     margin: "0px 2px",
-    maxWidth: 30,
-    minWidth: 30,
-    maxHeight: 30,
-    minHeight: 30,
+    height: 30,
+    width: 30,
     borderRadius: "50%",
-    boxShadow: "1px 1px 2px grey"
+    boxShadow: "1px 1px 2px grey",
+    '&:hover': {
+      color: '#fff',
+      background: 'linear-gradient(to right, #ff6641, #ff2a53)',
+    },
   },
   cancelBtn: {
     background: "linear-gradient(to right, #ffffff, #e8ecef)",
     position: "absolute",
     color: "#000000fb",
     right: 30,
+    '&:hover': {
+      color: '#000',
+      background: 'linear-gradient(to right, #e1e1e1, #b7b7b7)',
+    },
     [theme.breakpoints.only("xs")]: {
       right: 20
     }
@@ -125,6 +126,10 @@ const useStyle = makeStyles(theme => ({
     position: "absolute",
     color: "#000000fb",
     left: 30,
+    '&:hover': {
+      color: '#000',
+      background: 'linear-gradient(to right, #e1e1e1, #b7b7b7)',
+    },
     [theme.breakpoints.only("xs")]: {
       left: 20
     }
@@ -147,10 +152,10 @@ const display = (field, record, input = false) => {
 const FormRow = ({ input, validate, hidden }) => {
   const classes = useStyle();
   const { field, editable, record, handleKeyDown } = input;
-  const { label, name, placeholder, inputProps, validations } = field || {};
+  const { label, name, placeholder, multiline, inputProps, validations } = field || {};
   const { error, errors, register } = validate;
   const resError = error.field === name,
-    helperText = (errors[name] && errors[name].message) || (resError && error.message) || ' ';
+    helperText = (errors[name] && errors[name].message) || (resError && error.message) || '';
 
   return (
     !hidden &&
@@ -162,9 +167,10 @@ const FormRow = ({ input, validate, hidden }) => {
         {
           (
             editable &&
-            <Tooltip title={label}>
+            <Tooltip arrow title={label} disableFocusListener={true}>
               <Input
                 fullWidth
+                multiline={multiline}
                 name={name}
                 inputProps={inputProps}
                 placeholder={placeholder}
@@ -174,7 +180,7 @@ const FormRow = ({ input, validate, hidden }) => {
                 onKeyDown={(event) => handleKeyDown(event)}
               />
             </Tooltip>
-          ) || display(name, record, false)
+          ) || ReactHtmlParser(display(name, record, false))
         }
         <FormHelperText error>
           {helperText}
@@ -237,6 +243,7 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
   const handleAction = (func) => {
     func(id);
     setError({});
+    setSelectedFile(undefined);
   }
 
   const handleUpload = ({ target }) => {
@@ -245,7 +252,16 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
     setSelectedFile(blob);
   }
 
+  const handleRemove = (event, removing) => {
+    event.target.value = null;
+    setSelectedFile(undefined);
+
+    if (removing)
+      event.preventDefault();
+  }
+
   const onSubmit = data => {
+    Object.keys(data).forEach(k => data[k] = typeof data[k] == 'string' ? data[k].trim() : data[k]);
     var { status, error } = updateRecord({ ...data, id, avatar: selectedFile });
     if (!status) setError(error);
   };
@@ -257,7 +273,7 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
           {
             record && (
               <>
-                <Tooltip title="Back">
+                <Tooltip arrow title="Back">
                   <Fab
                     size="small"
                     className={classes.backBtn}
@@ -266,7 +282,7 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
                     <ArrowBack />
                   </Fab>
                 </Tooltip>
-                <Tooltip title={editable ? "Cancel" : "Edit"}>
+                <Tooltip arrow title={editable ? "Cancel" : "Edit"}>
                   <Fab
                     size="small"
                     className={editable ? classes.cancelBtn : classes.editBtn}
@@ -290,36 +306,19 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
                     id="contained-button-file"
                     multiple
                     type="file"
+                    onClick={(event) => handleRemove(event, avatar || selectedFile)}
                     onChange={handleUpload}
                   />
-                  {
-                    (avatar || selectedFile) &&
-                    <Tooltip title="Remove">
-                      <Button
-                        className={classes.removeBtn}
-                        onClick={() => setSelectedFile(undefined)}
-                      >
-                        <Delete />
-                      </Button>
-                    </Tooltip>
-                  }
-                  <label htmlFor="contained-button-file">
-                    <Tooltip title="Change">
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        className={classes.overlayEdit}
-                      >
-                        <Edit />
-                      </Box>
+                  <label htmlFor="contained-button-file" className={classes.avatarBtn}>
+                    <Tooltip arrow title={(avatar || selectedFile) ? 'Remove' : 'Change'}>
+                      {(avatar || selectedFile) ? <Delete /> : <Edit />}
                     </Tooltip>
                   </label>
                 </>
               }
               <Avatar
                 className={classes.avatar}
-                src={selectedFile || display("avatar", record)}
+                src={selectedFile ? selectedFile : display("avatar", record)}
                 style={{
                   backgroundColor: stringToColour(
                     display(fields[0].name, record) + display(fields[1].name, record, true)
@@ -350,7 +349,7 @@ const RecordForm = ({ record, editable, editRecord, updateRecord, goBack, formSc
               editable &&
               (
                 <Grid item container justify="center">
-                  <Tooltip title="Save">
+                  <Tooltip arrow title="Save">
                     <Fab
                       variant="extended"
                       className={classes.saveBtn}
