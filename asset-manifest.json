@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/contact-list/static/css/main.f1b3d7a8.chunk.css",
-    "main.js": "/contact-list/static/js/main.c677c522.chunk.js",
-    "main.js.map": "/contact-list/static/js/main.c677c522.chunk.js.map",
+    "main.js": "/contact-list/static/js/main.24cc7a36.chunk.js",
+    "main.js.map": "/contact-list/static/js/main.24cc7a36.chunk.js.map",
     "runtime-main.js": "/contact-list/static/js/runtime-main.8add0db0.js",
     "runtime-main.js.map": "/contact-list/static/js/runtime-main.8add0db0.js.map",
     "static/css/2.8bd3faab.chunk.css": "/contact-list/static/css/2.8bd3faab.chunk.css",
     "static/js/2.868753fa.chunk.js": "/contact-list/static/js/2.868753fa.chunk.js",
     "static/js/2.868753fa.chunk.js.map": "/contact-list/static/js/2.868753fa.chunk.js.map",
     "index.html": "/contact-list/index.html",
-    "precache-manifest.64cd208d2bf8b2dec6e41dea408f0e8f.js": "/contact-list/precache-manifest.64cd208d2bf8b2dec6e41dea408f0e8f.js",
+    "precache-manifest.b53f28154e1231a5eed8fed619490457.js": "/contact-list/precache-manifest.b53f28154e1231a5eed8fed619490457.js",
     "service-worker.js": "/contact-list/service-worker.js",
     "static/css/2.8bd3faab.chunk.css.map": "/contact-list/static/css/2.8bd3faab.chunk.css.map",
     "static/css/main.f1b3d7a8.chunk.css.map": "/contact-list/static/css/main.f1b3d7a8.chunk.css.map",
@@ -23,6 +23,6 @@
     "static/css/2.8bd3faab.chunk.css",
     "static/js/2.868753fa.chunk.js",
     "static/css/main.f1b3d7a8.chunk.css",
-    "static/js/main.c677c522.chunk.js"
+    "static/js/main.24cc7a36.chunk.js"
   ]
 }
