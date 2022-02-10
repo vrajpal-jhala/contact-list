@@ -16,7 +16,7 @@
     "gh-pages": "^2.2.0",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.3",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "prop-types": "^15.7.2",
     "react": "16.13.0",
     "react-content-loader": "^5.0.2",
